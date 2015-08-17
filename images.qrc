@@ -1,0 +1,36 @@
+<RCC>
+  <qresource prefix="/images">
+      <file alias='logo.png'>images/logo.png</file>
+      <file alias='students.png'>images/students.png</file>
+      <file alias='kchart.png'>images/kchart.png</file>
+      <file alias='disconnect.png'>images/disconnect.png</file>
+      <file alias='app_reboot.png'>images/app_reboot.png</file>
+      <file alias='app_exit.png'>images/app_exit.png</file>
+      <file alias='button_apply.png'>images/button_apply.png</file>
+      <file alias='button_cancel.png'>images/button_cancel.png</file>
+      <file alias='user-icon.png'>images/user-icon.png</file>
+      <file alias='button_new_row.png'>images/button_new_row.png</file>
+      <file alias='button_remove.png'>images/button_remove.png</file>
+      <file alias='editdelete.png'>images/editdelete.png</file>
+      <file alias='classroom-icon.png'>images/classroom-icon.png</file>
+      <file alias='loading.gif'>images/loading.gif</file>
+      <file alias='printer.png'>images/printer.png</file>
+      <file alias='printpreview.png'>images/printpreview.png</file>
+      <file alias='exportpdf.png'>images/exportpdf.png</file>
+      <file alias='printheader.jpg'>images/printheader.jpg</file>
+      <file alias='newaction.png'>images/newaction.png</file>
+      <file alias='edit.png'>images/edit.png</file>
+      <file alias='configure.png'>images/configure.png</file>
+      <file alias='database.png'>images/database.png</file>
+      <file alias='add_user.png'>images/add_user.png</file>
+      <file alias='keys.png'>images/keys.png</file>
+      <file alias='classe.png'>images/classe.png</file>
+      <file alias='topic.png'>images/topic.png</file>
+      <file alias='academicyear.jpg'>images/academicyear.jpg</file>
+      <file alias='logomatlle.png'>images/logomatlle.png</file>
+      <file alias='logomatllebanner.png'>images/logomatllebanner.png</file>
+      <file alias='splash.png'>images/splash.png</file>
+      <file alias='banner.png'>images/banner.png</file>
+  </qresource>
+
+</RCC>
