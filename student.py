@@ -2669,3 +2669,36 @@ class Student(QTreeView):
 
 
 
+    @staticmethod
+    def getNameById(std_id):
+        student_name = u'' 
+        sql = "SELECT \
+                student_last_name last_name, \
+                student_first_name first_name \
+               FROM student \
+               WHERE student_id = :id" 
+
+        query = QSqlQuery()
+        query.prepare(sql)
+        query.bindValue(":id", std_id)
+
+        if query.exec_():
+            record = query.record()
+            if not record.isEmpty():
+                while(query.next()):
+                  last_name = (
+                            query.value(
+                             record.indexOf("last_name")).toString())
+
+                  first_name = (
+                            query.value(
+                             record.indexOf("first_name")).toString())
+                  
+                  student_name = last_name + " " + first_name
+
+
+        else:
+            print "SQL Error!"
+
+        
+        return student_name

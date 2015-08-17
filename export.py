@@ -583,13 +583,16 @@ class Export(QDialog):
         self.printer.setOrientation(QPrinter.Portrait)
 
         self.printer.setOutputFormat(QPrinter.PdfFormat)
-
+        
+        """
         doc_name = QFileDialog.getSaveFileName(self, u"Exporter pdf", 
                 QDir.homePath() + u"/bulletin.pdf", 
                                                           "PDF (*.pdf)")
         if doc_name.isEmpty() or doc_name is None:
             return
         self.printer.setOutputFileName(doc_name)
+        """
+
         #self.printer.setOutputFileName("bulletin.pdf")
 
         #dialog = QPrintDialog(self.printer, self)
@@ -597,6 +600,9 @@ class Export(QDialog):
         #dialog.setWindowTitle(u"Exporter PDF - InterNotes")
 
         #if dialog.exec_():
+
+        advice_pdf_name = u'/bulletin_' # advice... how say 'proposer' in English?
+
         if 1:
             topics = []
             group_period = ''
@@ -606,18 +612,40 @@ class Export(QDialog):
             infos_std = {}
             group_period = self.combo_period.currentText()
 
+            advice_pdf_name += group_period + u"_"
+
             if self.btn_radio_selected_student.isChecked():
                 std_id = self.getSelectedStudentId()
                 stds_id.append(std_id)
+
+                student_name = student.Student.getNameById(std_id)
+
+                advice_pdf_name += student_name
+                
             else:
                 cr_index = self.combo_classroom.currentIndex()
                 current_std_crid = self.combo_classroom.itemData(cr_index).toInt()[0]
-                cr_list_stds_id = student.Student.getAllStudentsIdByClassroomId(current_std_crid)
+                cr_list_stds_id = student.Student.getAllStudentsIdByClassroomId(
+                        current_std_crid)
+
+                advice_pdf_name += self.combo_classroom.currentText()
+
 
                 for i in range(0, len(cr_list_stds_id)):
                     stdid = cr_list_stds_id[i]
                     if student.Student.isStudentHasAnyMarksInThisMarkGroup(stdid, group_period):
                         stds_id.append(stdid)
+
+            advice_pdf_name += u".pdf"
+
+            doc_name = QFileDialog.getSaveFileName(self, u"Exporter pdf", 
+                QDir.homePath() + advice_pdf_name, 
+                                                          "PDF (*.pdf)")
+            if doc_name.isEmpty() or doc_name is None:
+                return
+            self.printer.setOutputFileName(doc_name)
+
+
 
 
 
@@ -2296,7 +2324,7 @@ class Export(QDialog):
 
 
         self.btn_radio_selected_student = QRadioButton(u"L'élève selectioné(e)")
-        self.btn_radio_all_students = QRadioButton(u"Tous les élèves d'une classe")
+        self.btn_radio_all_students = QRadioButton(u"Tous les élèves d'une salle de classe")
 
 
 
