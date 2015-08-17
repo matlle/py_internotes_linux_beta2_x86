@@ -260,9 +260,6 @@ class MainWindow(QMainWindow):
         self.action_exit.setShortcut(QKeySequence("Ctrl+Q"))
         self.action_about.setShortcut(QKeySequence("Ctrl+H"))
         self.action_export_pdf.setShortcut(QKeySequence("Ctrl+E"))
-    
-
-
 
 
      

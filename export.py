@@ -601,7 +601,7 @@ class Export(QDialog):
 
         #if dialog.exec_():
 
-        advice_pdf_name = u'/bulletin_' # advice... how say 'proposer' in English?
+        advice_pdf_name = u'/bulletin-' # advice... how say 'proposer' in English?
 
         if 1:
             topics = []
@@ -612,7 +612,7 @@ class Export(QDialog):
             infos_std = {}
             group_period = self.combo_period.currentText()
 
-            advice_pdf_name += group_period + u"_"
+            advice_pdf_name += group_period + u"-"
 
             if self.btn_radio_selected_student.isChecked():
                 std_id = self.getSelectedStudentId()

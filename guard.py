@@ -67,7 +67,7 @@ class Guard(QDialog):
 
 
     def enterKeyDialog(self, alone=False):
-        self.active_dialog = keydialog.KeyDialog()
+        self.active_dialog = keydialog.KeyDialog(self)
 
        
         #events
@@ -98,7 +98,8 @@ class Guard(QDialog):
             u"pour obtenir une clé d'activation:<br/><br/>"
             u"Email:  <strong>paso.175@gmail.com</strong><br/>"
             u"Tel:  <strong>(+225) 07 08 68 98</strong> / "
-            u"      <strong> 41 87 07 68</strong>"
+            u"      <strong> 41 87 07 68</strong> / "
+            u"      <strong> 01 58 03 30</strong>"
             )
 
         self.label_infos_time.setStyleSheet("font-size: 14px;")
@@ -174,7 +175,10 @@ class Guard(QDialog):
         else:
             first_time = first_time.toPyDateTime()
             if first_time > datetime.datetime.now():
+                
+                # commet or not comment this... can be dangerous to put it here
                 q_settings.setValue("ended", 1)
+
                 return "expired"
 
             if first_time < datetime.datetime.now() - datetime.timedelta(
@@ -205,7 +209,7 @@ class Guard(QDialog):
                     u"Veuillez activé le logiciel avec une clé valide.\n\n"
                     u"Ou contactez le frabricant du logiciel (MATLLE) pour obtenir une clé d'activation:\n\n"
                     u"Email: paso.175@gmail.com\n"
-                    u"Tel: (+225) 07 08 68 98 / 41 87 07 68"
+                    u"Tel: (+225) 07 08 68 98 / 41 87 07 68 / 01 58 03 30"
                     )
             self.enterKeyDialog(alone=True)
         elif re == "first":

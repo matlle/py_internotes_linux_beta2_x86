@@ -33,8 +33,12 @@ class About(QDialog):
 
         label_about = QLabel()
         label_about.setText(QString(
-           u"<strong>InterNotes</strong> est un logiciel conçut par <strong><u>matlle</u></strong> "
-           u" dans le but de faciliter la gestion des notes et bulletin de note."))
+           u"<strong>InterNotes</strong>, logiciel conçu pour rendre simple et facile la gestion des bulletins de notes scolaires et universitaires<br/><br/> "
+           u"<strong>Version 1.0.2 (Windows x86)</strong><br></br><br/><br/><br/>"
+           u"Copyright 2015 Matlle e.i. Tous droits reservés.<br/><br/><br/><br/><br/><br/><br/><br/>"
+           u"<span style="">(+225) 07 08 68 98 / 41 87 07 68 / 01 58 03 30</span><br/>"
+           u"www.matlle.com"))
+
         label_about.setAlignment(Qt.AlignLeft)
         label_about.setWordWrap(True)
 
@@ -47,8 +51,8 @@ class About(QDialog):
 
         label_licence = QLabel()
         label_licence.setText(QString(
-            u"<strong>InterNotes</strong> est un logiciel conçut par matlle "
-            u"dans<br/> le but de faciliter gestion des notes et bulletin de note."))
+            u"Licence d'utilisation"
+            u""))
         label_licence.setAlignment(Qt.AlignLeft)
         label_licence.setWordWrap(True)
 

@@ -29,7 +29,8 @@ class KeyDialog(QDialog):
 
 
     def init(self):
-        self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowTitleHint)
+        #self.setWindowFlags(Qt.CustomizeWindowHint)
+
         self.setWindowModality(Qt.WindowModal)
 
         self.key_code = QLineEdit()
