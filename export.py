@@ -725,7 +725,7 @@ class Export(QDialog):
                     self.painter.drawRect(rect_header_company_name)
 
                     self.painter.drawText(
-                        QRectF(x, y + 10, w_header_company_name, fm_height), 
+                        QRectF(x, y + 30, w_header_company_name, fm_height), 
                             QString("%1")
                               .arg(auth.Auth.getAccountCompanyName()).toUpper()
                               , option)
@@ -751,7 +751,7 @@ class Export(QDialog):
                
                     option = QTextOption(Qt.AlignLeft)
                     self.painter.drawText(
-                         QRectF(x, y + 10, w_header_postal_phone, fm_height + 200), 
+                         QRectF(x, y + 35, w_header_postal_phone, fm_height + 200), 
                          QString("Localisation:"+ " " +"%1\nAdresse Postale:" + "  " +"%2\nTéléphone: %3")
                               .arg(header_infos["account_school_localization"]).toUpper()
                               .arg(header_infos["account_postal_address"]).toUpper()
@@ -777,7 +777,7 @@ class Export(QDialog):
 
                     option = QTextOption(Qt.AlignCenter)
                     self.painter.drawText(
-                         QRectF(header_x, y + 10, w_header_minister, fm_height + 80), 
+                         QRectF(header_x, y + 35, w_header_minister, fm_height + 80), 
                          QString("RÉPUBLIQUE DE CÔTE D'IVOIRE\n%1")
                               .arg(header_infos["header_minister"]).toUpper()
                               , option)
