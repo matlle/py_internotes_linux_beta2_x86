@@ -145,7 +145,7 @@ class Auth(QDialog):
                 self.done(1)
             else:
                 self.bad_counter -= 1
-                QMessageBox.critical(self, "Infos", "Email/Nom d'utilisateur et/ou mot de passe incorrect.\nEssai restant (%d)" % self.bad_counter)
+                QMessageBox.critical(self, u"Error - InterNotes", u"Email/Nom d'utilisateur et/ou mot de passe incorrect.\nEssai restant (%d)" % self.bad_counter)
                 if self.bad_counter == 0:
                     self.password.clear()
                     sys.exit(0)

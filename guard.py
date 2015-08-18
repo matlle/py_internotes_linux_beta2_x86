@@ -205,7 +205,7 @@ class Guard(QDialog):
             QMessageBox.critical(self, u"Licence d'évaluation expirée - InterNotes", 
                     u"Votre période d'essai InterNotes a expiré.\n"
                     u"Veuillez activé le logiciel avec une clé valide.\n\n"
-                    u"Ou contactez le frabricant du logiciel (MATLLE) pour obtenir une clé d'activation:\n\n"
+                    u"Ou contactez le frabricant du logiciel (Matlle) pour obtenir une clé d'activation:\n\n"
                     u"Email: paso.175@gmail.com\n"
                     u"Tel: (+225) 07 08 68 98 / 41 87 07 68 / 01 58 03 30"
                     )
