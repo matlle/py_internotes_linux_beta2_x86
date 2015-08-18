@@ -18,7 +18,7 @@ def main():
 
     while reboot:
         app = QApplication(sys.argv)
-        app.setOrganizationName("MATLLE")
+        app.setOrganizationName("Matlle")
         app.setOrganizationDomain("matlle.com")
         app.setApplicationName("InterNotes")
         app.setWindowIcon(QIcon(':/images/logo.png'))
@@ -55,6 +55,7 @@ def main():
 
 
         g = guard.Guard() 
+
         mainwindow = None 
 
         try:

@@ -29,18 +29,27 @@ class MainWindow(QMainWindow):
             raise ValueError('Database not connected')
 
         else:
-            splash.showMessage(u"Connecté à la base de donnée!", Qt.AlignBottom | Qt.AlignLeft)
+            
+            if auth.Auth.isAnyAccountExist() == "SQL Error":
+                QMessageBox.critical(self, u"Error - InterNotes", 
+                        u"InterNotes n'arrive pas à détecter un compte d'utilisateur. "
+                        u"Veuillez vous assurer que les paramètres de connexion à la "
+                        u"base de donnée sont correctes et que les differentes relations "
+                        u"necessaires y ont été crée.")
+                self.dbconf.dbConfigDialog()
+                raise ValueError("Database new configuration")
+            else:
+                splash.showMessage(u"Connecté à la base de donnée!", Qt.AlignBottom | Qt.AlignLeft)
+                a = auth.Auth(self)
 
-            a = auth.Auth(self)
-
-            self.init()
+                self.init()
 
         splash.finish(self)
 
 
 
     def writePositionSettings(self):
-        q_settings = QSettings("MATLLE", "InterNotes")
+        q_settings = QSettings("Matlle", "InterNotes")
         q_settings.beginGroup("mainwindow")
 
         q_settings.setValue("geometry", self.saveGeometry())
@@ -54,7 +63,7 @@ class MainWindow(QMainWindow):
 
 
     def readPositionSettings(self):
-        q_settings = QSettings("MATLLE", "InterNotes")
+        q_settings = QSettings("Matlle", "InterNotes")
 
         q_settings.beginGroup("mainwindow")
 
@@ -146,7 +155,7 @@ class MainWindow(QMainWindow):
 
         statistic_item = QListWidgetItem(self.contents_widget)
         statistic_item.setIcon(QIcon(":/images/kchart.png"))
-        statistic_item.setText(QString("Graphiques"))
+        statistic_item.setText(QString("Statistiques"))
         
 
     def changePage(self, current, previous):
@@ -276,7 +285,7 @@ class MainWindow(QMainWindow):
     def onShowEnterKeyDialog(self):
         if self.guard:
             if self.guard.activated_prod:
-                q_settings = QSettings("MATLLE", "InterNotes")
+                q_settings = QSettings("Matlle", "InterNotes")
                 q_settings.beginGroup("as")
 
                 key = q_settings.value("k", "").toString()

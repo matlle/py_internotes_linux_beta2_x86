@@ -37,7 +37,7 @@ class Guard(QDialog):
         raw_key = self.active_dialog.key_code.text()
         key = self.active_dialog.key_code.text().replace("-", "")
         if key == self.k_prod:
-            q_settings = QSettings("MATLLE", "InterNotes")
+            q_settings = QSettings("Matlle", "InterNotes")
 
             q_settings.beginGroup("as")
         
@@ -141,7 +141,7 @@ class Guard(QDialog):
 
 
     def isAppActived(self):
-        q_settings = QSettings("MATLLE", "InterNotes")
+        q_settings = QSettings("Matlle", "InterNotes")
 
         q_settings.beginGroup("as")
         
@@ -157,14 +157,11 @@ class Guard(QDialog):
 
 
     def remainingTime(self):
-        q_settings = QSettings("MATLLE", "InterNotes")
-
+        q_settings = QSettings("Matlle", "InterNotes")
         q_settings.beginGroup("rt")
 
         first_time = q_settings.value(u"ft", u"").toDateTime()
         expired = q_settings.value(u"ended", 0).toInt()[0]
-        
-        q_settings.endGroup()
 
         if expired:
             return "expired"
@@ -193,6 +190,7 @@ class Guard(QDialog):
                 remaining_days = self.trial_days - elapsed_days
                 return remaining_days 
             
+        q_settings.endGroup()
         
 
 

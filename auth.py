@@ -31,7 +31,8 @@ class Auth(QDialog):
         self.reject()
         sys.exit(0)
 
-    def isAnyAccountExist(self):
+    @staticmethod
+    def isAnyAccountExist():
         sql = "SELECT account_id FROM account"
 
         query = QSqlQuery(sql)
@@ -41,7 +42,7 @@ class Auth(QDialog):
             else:
                 return False
         else:
-            print "SQL Error!"
+            return "SQL Error"
 
     def isEmailAddressValid(self, email):
         s = QString("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b")
@@ -68,13 +69,13 @@ class Auth(QDialog):
 
 
         query = QSqlQuery()
-        query.prepare("INSERT INTO account(\
+        query.prepare("INSERT INTO account (\
                               account_company_name, \
                               account_username, \
                               account_password, \
                               account_email, \
                               account_created_at) \
-                       VALUES( \
+                       VALUES ( \
                               :company, \
                               :username, \
                               :password, \

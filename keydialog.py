@@ -57,7 +57,6 @@ class KeyDialog(QDialog):
         layout_btn.setAlignment(Qt.AlignRight)
 
 
-
         layout_main = QVBoxLayout()
         layout_main.addWidget(group_form)
         layout_main.addLayout(layout_btn)

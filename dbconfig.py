@@ -38,7 +38,7 @@ class DbConfig(QDialog):
         sys.exit(0)
 
     def setDbConnection(self):
-        q_settings = QSettings("MATLLE", "InterNotes")
+        q_settings = QSettings("Matlle", "InterNotes")
         q_settings.beginGroup("db_config")
 
         q_settings.setValue("db_host", self.line_edit_db_host.text())
@@ -57,6 +57,8 @@ class DbConfig(QDialog):
 
         self.dialog.close()
         QApplication.exit(tools.EXIT_CODE_REBOOT)
+
+
     
 
     def getDbConnection(self):
@@ -77,8 +79,7 @@ class DbConfig(QDialog):
     def activeOkBtn(self):
         if self.line_edit_db_host.text().isEmpty() or \
            self.line_edit_db_name.text().isEmpty() or \
-           self.line_edit_db_username.text().isEmpty() or \
-           self.line_edit_db_password.text().isEmpty():
+           self.line_edit_db_username.text().isEmpty():
             self.btn_ok.setEnabled(False)
         else:
             self.btn_ok.setEnabled(True)
@@ -185,7 +186,7 @@ class DbConfig(QDialog):
     def init(self):
         #self.findDbSettings()
 
-        q_settings = QSettings("MATLLE", "InterNotes")
+        q_settings = QSettings("Matlle", "InterNotes")
 
         q_settings.beginGroup("db_config")
 
@@ -194,7 +195,7 @@ class DbConfig(QDialog):
         self.db_username = q_settings.value("db_username", u"root").toString()
         self.db_password = q_settings.value("db_password", u"").toString()
 
-        q_settings.endGroup();
+        q_settings.endGroup()
 
         self.db = self.getDbConnection()
         if not self.db.open():

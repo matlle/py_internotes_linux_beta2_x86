@@ -47,7 +47,7 @@ def send_email(to, subject, msg):
 
 
 def t_account_created(company, username):
-    msg = "Bonjour Mr/Mme responsable " + company + ",\n\n\nVotre nouveau compte a été crée avec succèes.\n\n\nVous pouvez desormais vous connecter sur le logiciel InterNotes.\n\n\nVotre nom d\'utilisateur est: " + username + "\n\n\nVotre mot de passe est celui que vous avez entré lors de la création du compte.\n\n\nCordialement, \n\n\n\nL'équipe MATLLE \n\n(+225) 07 08 68 98\n(+225) 41 87 07 68\n(+225) 01 58 03 30 \nhttp://www.matlle.com"
+    msg = "Bonjour Mr/Mme responsable " + company + ",\n\n\nVotre nouveau compte a été crée avec succèes.\n\n\nVous pouvez desormais vous connecter sur le logiciel InterNotes.\n\n\nVotre nom d\'utilisateur est: " + username + "\n\n\nVotre mot de passe est celui que vous avez entré lors de la création du compte.\n\n\nCordialement, \n\n\n\nL'équipe InterNotes \n\n(+225) 07 08 68 98\n(+225) 41 87 07 68\n(+225) 01 58 03 30 \nhttp://www.matlle.com"
 
          
     return msg
