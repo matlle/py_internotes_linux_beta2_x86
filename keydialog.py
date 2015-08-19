@@ -15,7 +15,7 @@ class KeyDialog(QDialog):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            pass
+            event.ignore()
 
 
     def activeOkBtnActivation(self):
@@ -30,7 +30,6 @@ class KeyDialog(QDialog):
 
     def init(self):
         #self.setWindowFlags(Qt.CustomizeWindowHint)
-
         self.setWindowModality(Qt.WindowModal)
 
         self.key_code = QLineEdit()
@@ -73,4 +72,6 @@ class KeyDialog(QDialog):
         #events
         self.connect(self.key_code, SIGNAL("cursorPositionChanged(int, int)"),
                 self.activeOkBtnActivation)
+
+
 

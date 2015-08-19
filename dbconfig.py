@@ -32,7 +32,7 @@ class DbConfig(QDialog):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            pass
+            event.ignore()
     
     def stop(self):
         sys.exit(0)
@@ -95,6 +95,7 @@ class DbConfig(QDialog):
     
     def dbConfigDialog(self, parent=None, q=False):
         self.dialog = QDialog(parent)
+        self.dialog.setWindowModality(Qt.WindowModal)
 
         self.line_edit_db_host = QLineEdit(self.db_host) if self.db_host else QLineEdit()
         #self.line_edit_db_host.setInputMask("000.000.000.000;_")

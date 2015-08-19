@@ -68,6 +68,7 @@ class Guard(QDialog):
 
     def enterKeyDialog(self, alone=False):
         self.active_dialog = keydialog.KeyDialog(self)
+        self.active_dialog.setWindowModality(Qt.WindowModal)
 
        
         #events
@@ -94,7 +95,7 @@ class Guard(QDialog):
             u"Il vous reste <strong>" + str(days) + "</strong> "
             u"jours avant la fin de la periode d'essai.<br/>"
             u"Pensez à activer le logiciel avec une clé valide.<br/><br/>"
-            u"Ou contactez (<strong>MATLLE</strong>) le fabricant du produit<br/>"
+            u"Ou contactez (<strong>Matlle</strong>) le fabricant du produit<br/>"
             u"pour obtenir une clé d'activation:<br/><br/>"
             u"Email:  <strong>paso.175@gmail.com</strong><br/>"
             u"Tel:  <strong>(+225) 07 08 68 98</strong> / "

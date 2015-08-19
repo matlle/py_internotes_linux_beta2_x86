@@ -385,8 +385,8 @@ class MainWindow(QMainWindow):
         p = export.Export(self.student_page, self)
 
 
-    def onShowPrintingDialog(self):
-        p = printing.Printing(self.student_page, self)
+    #def onShowPrintingDialog(self):
+    #    p = printing.Printing(self.student_page, self)
 
     def onShowSigninDialog(self):
         a = auth.Auth(self)
