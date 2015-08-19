@@ -43,6 +43,8 @@ class Class(QTreeWidget):
 
     def selectClassesByAcademicYearId(self, item, col):
         self.clear()
+        if not item:
+            return
         Class.list_items_room = []
         ayid = item.data(0, 11).toInt()[0]
         ayname = item.text(0)
