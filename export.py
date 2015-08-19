@@ -570,7 +570,7 @@ class Export(QDialog):
         self.painter.drawText(
             QRectF(x, y,
             pageRect.width() - 0.5 * 700, 150), 
-             QString(u"Généré le %1 par InterNotes Version 1.0.2  © 2015 - 2016, Matlle e.i.")
+             QString(u"Généré le %1 par InterNotes Version 1.0.2  © 2015 - 2016, Matlle e.i. www.matlle.com")
                               .arg(output_date)
                               , option)
         self.painter.restore()
