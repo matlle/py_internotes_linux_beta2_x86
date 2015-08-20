@@ -570,7 +570,7 @@ class Export(QDialog):
         self.painter.drawText(
             QRectF(x, y,
             pageRect.width() - 0.5 * 700, 150), 
-             QString(u"Généré le %1 par InterNotes Version 1.0.2 © 2015 - 2016, Matlle e.i. www.matlle.com")
+             QString(u"Généré le %1 par InterNotes Version 1.0.2 © 2014 - 2015, Matlle e.i. www.matlle.com")
                               .arg(output_date)
                               , option)
         self.painter.restore()
@@ -1725,7 +1725,7 @@ class Export(QDialog):
                              u"Rappel", option)
 
                     t_x += rect_recall.width()
-                    w_moy = w_recall - 490
+                    w_moy = w_recall - 480
 
                     rect_moy = QRect(t_x, y, w_moy, fm_height + 10)
                     self.painter.drawRect(rect_moy)
