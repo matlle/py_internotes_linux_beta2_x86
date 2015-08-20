@@ -565,12 +565,12 @@ class Export(QDialog):
         option = QTextOption(Qt.AlignCenter)
         option.setWrapMode(QTextOption.WordWrap)
         self.painter.setPen(Qt.black)
-        output_date = QDateTime.currentDateTime().toString(
+        output_date = QDateTime.currentDateTime().toLocalTime().toString(
                             u"dddd dd MMMM yyyy \'à\' hh\'h\':mm\'m\':ss\'s\'")
         self.painter.drawText(
             QRectF(x, y,
             pageRect.width() - 0.5 * 700, 150), 
-             QString(u"Généré le %1 par InterNotes Version 1.0.2 © 2014 - 2015, Matlle e.i. www.matlle.com")
+             QString(u"Fait le %1 par InterNotes Version 1.0.2 © 2014 - 2015, Matlle e.i. www.matlle.com")
                               .arg(output_date)
                               , option)
         self.painter.restore()
@@ -1123,7 +1123,7 @@ class Export(QDialog):
                 self.painter.setPen(Qt.black)
                 self.painter.drawText(
                         QRectF(p_r_x + 50, p_r_y + 20, w_dd_r - 6, fm_height - 6), 
-                            u"REDOUBLANT:", option)
+                            u"REDOUBLANT(E):", option)
 
 
                 p_r_x += rect_pro_ay.width()
@@ -1171,7 +1171,7 @@ class Export(QDialog):
 
                 p_r_x += rect_pro_matricule_one.width()
 
-                w_dd_r = width_title_remark
+                w_dd_r = width_title_remark + 200
 
                 rect_pro_ay = QRect(p_r_x + 20, p_r_y + 20, w_dd_r, fm_height)
                 self.painter.setPen(Qt.NoPen)
@@ -1725,7 +1725,7 @@ class Export(QDialog):
                              u"Rappel", option)
 
                     t_x += rect_recall.width()
-                    w_moy = w_recall - 480
+                    w_moy = w_recall - 400
 
                     rect_moy = QRect(t_x, y, w_moy, fm_height + 10)
                     self.painter.drawRect(rect_moy)
