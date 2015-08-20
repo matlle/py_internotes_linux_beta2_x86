@@ -174,7 +174,7 @@ class Guard(QDialog):
             first_time = first_time.toPyDateTime()
             if first_time > datetime.datetime.now():
                 
-                # commet or not comment this... can be dangerous to put it here
+                # comment or uncomment this... can be dangerous to uncomment it
                 q_settings.setValue("ended", 1)
 
                 return "expired"
