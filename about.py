@@ -52,6 +52,7 @@ class About(QDialog):
 
         label_licence = QLabel()
         label_licence.setText(QString(
+            u"<h3>L'utilisation du present logiciel implique l'acceptation de ce contrat de licence<h3>"
             u"<h4>1. Licence<h4>"
             u"Le Propriétaire accorde au Bénéficiaire une licence non exclusive et non transférable "
             u"(1) pour utiliser le logiciel uniquement dans le cadre de ses activités à l'emplacement "
@@ -69,11 +70,15 @@ class About(QDialog):
             u"<h4>3. Installation et acceptation </h4>"
             u"Le Propriétaire prendra toute les dispositions nécessaires pour livrer les copies du logiciel "
             u"dont la licence est jointe au présent logiciel. Le Bénéficiaire disposera alors de 15 jours après la livraison "
-            u"pour effectuer le test d'acceptation du logiciel. L'acceptation du logiciel par le Bénéficiaire sera "
+            u"pour effectuer le test ou l'essai d'acceptation du logiciel. L'acceptation du logiciel par le Bénéficiaire sera "
             u"effective à partir de la date d'utilisation du logiciel ou à la date d'expiration de la période "
             u"de 15 jours à compter de la date d'installation sans que le Bénéficiaire n'ait besoin d'informer le "
             u"le Propriétaire de quelque erreur. Si le Bénéficiaire notifie une erreur au Propriétaire et le Bénéficiaire "
-            u"diagnostique la prétendue erreur, le logiciel sera accepté à la correction de cette erreur."
+            u"diagnostique la prétendue erreur, le logiciel sera accepté à la correction de cette erreur.<br/>"
+            u"<h4>4. Prix</h4>"
+            u"Le Bénéficiaire devra payer le prix du logiciel conformément aux modalités de paiement prévu "
+            u"et facturé de façon raisonnable par le propriétaire du logiciel pour l'installation du logiciel. "
+            u"Le paiement s'effectuera en intégralité sans quelque droit de compensation ou réduction et le Bénéficiaire paiera le prix et les frais au plus tard 30 jours aprés la période de test ou d'essai."
             ))
 
         label_licence.setAlignment(Qt.AlignLeft)
