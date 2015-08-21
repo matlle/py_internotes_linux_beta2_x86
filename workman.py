@@ -64,9 +64,9 @@ class Workman(QObject):
 
     def send_email(self, to, subject, msg):
 
-        gmail_user = "paso.175@gmail.com"
-        gmail_pwd = "141206@Azerty"
-        FROM = 'paso.175@gmail.com'
+        gmail_user = "matllesoftware@gmail.com"
+        gmail_pwd = "matllesoftware"
+        FROM = 'matllesoftware@gmail.com'
         TO = [str(to)] 
         SUBJECT = subject
         TEXT = msg 
