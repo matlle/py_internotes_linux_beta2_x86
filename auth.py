@@ -455,7 +455,7 @@ class Auth(QDialog):
 
     def errorSendEmail(self):                        
         QMessageBox.critical(self, "Error - InterNotes", 
-                "Echec d'envoie de l'email.\nVeuillez réssayer plus tard.")
+                "Echec d'envoie du message de reinitialisation.\nVeuillez réssayer plus tard.")
 
 
     def restorePassword(self):
