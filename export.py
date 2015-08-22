@@ -554,7 +554,7 @@ class Export(QDialog):
         #x = 700
         x = 72
         pageRect = self.printer.pageRect()
-        y = pageRect.height() - 72
+        y = pageRect.height() - 10
             
         self.painter.setPen(Qt.gray)
         self.painter.drawLine(x, y, pageRect.width() - 72, y)
@@ -686,7 +686,7 @@ class Export(QDialog):
                 fm = QFontMetrics(serif_font)
                 fm_height = int(fm.height() * 8.5)
 
-                left_margin = 72
+                left_margin = 100
                 x = left_margin
                 include_header = False
                 if self.btn_check_header.isChecked():
