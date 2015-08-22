@@ -607,6 +607,117 @@ class Student(QTreeView):
 
 
 
+    def setTableAwayByStudentIdAndByMarkGroup(self, group_index):
+        if self.combo_classroom.currentIndex() == -1 or self.stid == None:
+            return
+        else: 
+            ay_index = self.combo_ay.currentIndex()
+            cr_index = self.combo_classroom.currentIndex()
+            crid = self.combo_classroom.itemData(cr_index).toInt()[0]
+            if self.isStudentHasMarksInThisClassroomId(crid) == False:
+                return
+
+        mark_group = self.combo_mark_group.currentText()
+
+        query = QSqlQuery()
+        query.prepare("SELECT * \
+                       FROM away a \
+                       INNER JOIN topic t USING(topic_id) \
+                       WHERE student_id = :stid AND \
+                             mark_group = :group \
+                       ORDER BY t.topic_name, mark_date DESC")
+        query.bindValue(":stid", self.stid)
+        query.bindValue(":group", mark_group)
+
+        if query.exec_():
+            record = query.record()
+            if not record.isEmpty():
+                self.table_view.setRowCount(query.size())
+                nb_row = query.size()
+                items = []
+                for r in range(0, nb_row):
+                    self.table_view.setRowHeight(r, 20)
+                while query.next():
+                    row = {}
+                    mark_id = query.value(record.indexOf("mark_id")).toInt()[0]
+                    mark_mark = query.value(record.indexOf("mark_mark")).toDouble()[0]
+                    mark_level = query.value(record.indexOf("mark_level")).toInt()[0]
+                    mark_observation = query.value(record.indexOf("mark_observation")).toString()
+
+                    mark_date_string = query.value(record.indexOf("mark_date")).toString()
+                    l_date = mark_date_string.split("/")
+                    y = l_date[2].toInt()[0]
+                    m = l_date[1].toInt()[0]
+                    d = l_date[0].toInt()[0]
+                    new_date = QDate(y, m, d)
+                    mark_date_edit = QDateEdit(new_date)
+                    mark_date_edit.setCalendarPopup(True)
+                    mark_date_edit.setDisplayFormat(u"dd/MM/yyyy")
+
+                    topic_id = query.value(record.indexOf("topic_id")).toInt()[0]
+
+                    #item_name = QTableWidgetItem(topic_name)
+                    #item_name.setData(Qt.AccessibleTextRole, QVariant(topic_id))
+
+                    row['mark_id'] = mark_id
+                    row['mark_mark'] = mark_mark 
+                    row['mark_level'] = mark_level
+                    row['mark_observation'] = mark_observation
+                    row['mark_date'] = mark_date_edit 
+                    row['topic_id'] = topic_id 
+                    items.append(row)
+             
+
+                for i in range(0, len(items)):
+
+                    combo_topic = QComboBox()
+                    if self.combo_classroom.currentIndex() != -1:
+                        cr_index = self.combo_classroom.currentIndex()
+                        crid = self.combo_classroom.itemData(cr_index).toInt()[0]
+                        topics = topic.Topic.getAllTopicsByClassroomId(crid)
+                        for t in topics:
+                            combo_topic.addItem(t['topic_name'], QVariant(t['topic_id']))
+                        mark_topic_name = topic.Topic.getNameById(items[i]['topic_id']) 
+                        index = combo_topic.findText(mark_topic_name)
+                        combo_topic.setCurrentIndex(index)
+
+                    self.table_view.setCellWidget(i, 0, combo_topic)
+
+
+
+                    spin_mark = QDoubleSpinBox()
+                    #spin_mark.setMinimum(1)
+                    spin_mark.setValue(items[i]['mark_mark'])
+                    self.table_view.setCellWidget(i, 1, spin_mark)
+
+                    spin_level = QSpinBox()
+                    spin_level.setMinimum(1)
+                    spin_level.setValue(items[i]['mark_level'])
+                    self.table_view.setCellWidget(i, 2, spin_level)
+                    
+                    item_observation = QTableWidgetItem(items[i]['mark_observation'])
+                    item_observation.setData(Qt.AccessibleTextRole, QVariant(items[i]['mark_id']))
+                    self.table_view.setItem(i, 3, item_observation)
+
+
+                    self.table_view.setCellWidget(i, 4, items[i]['mark_date'])
+
+
+
+                    self.connect(combo_topic, SIGNAL("currentIndexChanged(int)"), 
+                                     self.activeSaveBtn)
+
+                    self.connect(spin_mark, SIGNAL("valueChanged(double)"), 
+                                     self.activeSaveBtn)
+
+                    self.connect(spin_level, SIGNAL("valueChanged(int)"), 
+                                     self.activeSaveBtn)
+
+                    self.connect(items[i]['mark_date'], SIGNAL("dateChanged(QDate)"), 
+                                     self.activeSaveBtn)
+
+
+        self.table_view.sortItems(4)
 
 
 
@@ -1631,10 +1742,91 @@ class Student(QTreeView):
          
 
 
+       
+        #page away
+        page_away = QWidget()
 
+        self.table_view_away = QTableWidget()
+        self.table_view_away.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_view_away.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table_view_away.setAlternatingRowColors(True)
+
+        self.table_view_away.setShowGrid(False)
+        self.table_view_away.setTabKeyNavigation(True)
+        self.table_view_away.setColumnCount(3)
+
+        headers = []
+        headers.append(u"Date")
+        headers.append(u"Justification")
+        headers.append(u"Motif")
+        self.table_view_away.setHorizontalHeaderLabels(headers)
+        self.table_view_away.setColumnWidth(0, 200)
+        self.table_view_away.setColumnWidth(1, 200)
+        self.table_view_away.setColumnWidth(2, 200)
+
+
+        
+        self.btn_save_away = QPushButton(u"Enregistrer tout")
+        self.btn_new_row_away = QPushButton(u"Nouvelle abscence")
+        self.btn_delete_row_away = QPushButton(u"Supprimer")
+        self.btn_cancel_away = QPushButton(u"Annuler")
+
+        self.btn_save_away.setEnabled(False)
+        self.btn_new_row_away.setEnabled(False)
+        self.btn_delete_row_away.setEnabled(False)
+        self.btn_cancel_away.setEnabled(False)
+
+
+        self.btn_save_away.setIcon(QIcon(":/images/button_apply.png"))
+        self.btn_new_row_away.setIcon(QIcon(":/images/button_new_row.png"))
+        self.btn_delete_row_away.setIcon(QIcon(":/images/button_remove.png"))
+        self.btn_cancel_away.setIcon(QIcon(":/images/button_cancel.png"))
+
+        self.activeNewAndCancelBtn()
+
+
+        self.combo_mark_group = QComboBox()
+        self.combo_mark_group.setMinimumWidth(200)
+        self.setMarkGroupComboBoxByAcademicYearId(ay_index)
+
+        layout_mark_group = QFormLayout()
+        layout_mark_group.addRow(u"Période: ", self.combo_mark_group)
+
+        #self.setTableAwayByStudentIdAndByMarkGroup(0)
+
+
+
+        btn_box = QDialogButtonBox(Qt.Vertical)
+        btn_box.addButton(self.btn_save_away, QDialogButtonBox.AcceptRole)
+        btn_box.addButton(self.btn_new_row_away, QDialogButtonBox.ActionRole)
+        btn_box.addButton(self.btn_delete_row_away, QDialogButtonBox.ActionRole)
+        btn_box.addButton(self.btn_cancel_away, QDialogButtonBox.ActionRole)
+
+        layout_main_page_mark = QHBoxLayout()
+        layout_main_page_mark.addWidget(self.table_view_away)
+        layout_main_page_mark.addWidget(btn_box)
+
+        layout_main_page_mark = QHBoxLayout()
+        layout_main_page_mark.addWidget(self.table_view_away)
+        layout_main_page_mark.addWidget(btn_box)
+
+        layout_boss = QVBoxLayout()
+        layout_boss.addLayout(layout_mark_group)
+        layout_boss.addLayout(layout_main_page_mark)
+
+        page_away.setLayout(layout_boss)
+         
+
+
+
+
+
+        
+        # add the pages to the onglet
         onglets = QTabWidget()
         onglets.addTab(page_info, "Information personnelles")
         onglets.addTab(page_mark, "Notes")
+        onglets.addTab(page_away, "Abscence")
 
 
 
@@ -1768,7 +1960,7 @@ class Student(QTreeView):
             reply = dialog_photo_preview.exec_()
 
             self.new_photo_file_name = QString(
-                    QDir.currentPath() + u"/mpl-data/images/upload/userphoto/" + \
+                    QDir.currentPath() + u"/images/upload/userphoto/" + \
                             uuid.uuid1().hex + ".png")
 
             if reply == 1:

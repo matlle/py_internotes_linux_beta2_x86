@@ -66,7 +66,7 @@ class Export(QDialog):
             reply = dialog_photo_preview.exec_()
 
             self.new_header_image_file_name = QString(
-                    QDir.currentPath() + u"/mpl-data/images/upload/header/" + \
+                    QDir.currentPath() + u"/images/upload/header/" + \
                     uuid.uuid1().hex + ".png")
 
             if reply == 1:
