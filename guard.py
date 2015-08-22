@@ -97,7 +97,7 @@ class Guard(QDialog):
             u"Pensez à activer le logiciel avec une clé valide.<br/><br/>"
             u"Ou contactez (<strong>Matlle</strong>) le fabricant du produit<br/>"
             u"pour obtenir une clé d'activation:<br/><br/>"
-            u"Email:  <strong>matllesoftware@gmail.com</strong><br/>"
+            u"Email:  <strong>info@matlle.com</strong><br/>"
             u"Tel:  <strong>(+225) 07 08 68 98</strong> / "
             u"      <strong> 41 87 07 68</strong> / "
             u"      <strong> 01 58 03 30</strong>"
@@ -207,7 +207,7 @@ class Guard(QDialog):
                     u"Votre période d'essai InterNotes a expiré.\n"
                     u"Veuillez activé le logiciel avec une clé valide.\n\n"
                     u"Ou contactez le frabricant du logiciel (Matlle) pour obtenir une clé d'activation:\n\n"
-                    u"Email: matllesoftware@gmail.com\n"
+                    u"Email: info@matlle.com\n"
                     u"Tel: (+225) 07 08 68 98 / 41 87 07 68 / 01 58 03 30"
                     )
             self.enterKeyDialog(alone=True)

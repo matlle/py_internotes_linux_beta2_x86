@@ -14,9 +14,9 @@ f = 0
 def send_email(to, subject, msg):
     import smtplib
 
-    gmail_user = "matllesoftware@gmail.com"
+    gmail_user = "info@matlle.com"
     gmail_pwd = "matlle2015"
-    FROM = 'matllesoftware@gmail.com'
+    FROM = 'info@matlle.com'
     TO = [str(to)] 
     SUBJECT = subject
     TEXT = msg 
@@ -29,7 +29,7 @@ def send_email(to, subject, msg):
     if f:
         try:
             #server = smtplib.SMTP(SERVER) 
-            server = smtplib.SMTP("smtp.gmail.com", 587)
+            server = smtplib.SMTP("smtp.matlle.com", 587)
             server.ehlo()
             server.starttls()
             server.login(gmail_user, gmail_pwd)
@@ -98,7 +98,7 @@ def run_send_email_for_reset_password(dialog):
         print "[-] Sending email canceled."
         done = True 
    
-    elif not done and send_email("matllesoftware@gmail.com", "Restore password", 
+    elif not done and send_email("info@matlle.com", "Restore password", 
            "Change your password"):
         print "[+] Successfully sent email."
 

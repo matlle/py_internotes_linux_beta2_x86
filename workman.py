@@ -64,9 +64,9 @@ class Workman(QObject):
 
     def send_email(self, to, subject, msg):
 
-        gmail_user = "matllesoftware@gmail.com"
+        gmail_user = "info@matlle.com"
         gmail_pwd = "matlle2015"
-        FROM = 'matllesoftware@gmail.com'
+        FROM = 'info@matlle.com'
         TO = [str(to)] 
         SUBJECT = subject
         TEXT = msg 
@@ -77,7 +77,7 @@ class Workman(QObject):
 
         try:
             #server = smtplib.SMTP(SERVER) 
-            server = smtplib.SMTP("smtp.gmail.com", 587)
+            server = smtplib.SMTP("smtp.matlle.com", 587)
             server.ehlo()
             server.starttls()
             server.login(gmail_user, gmail_pwd)
