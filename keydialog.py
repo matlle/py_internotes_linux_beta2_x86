@@ -29,6 +29,7 @@ class KeyDialog(QDialog):
 
 
     def init(self):
+        self.setWidgetResizable(False)
         #self.setWindowFlags(Qt.CustomizeWindowHint)
         self.setWindowModality(Qt.WindowModal)
 

@@ -127,9 +127,9 @@ class About(QDialog):
         self.setWindowTitle(u"À propos d'InterNotes")
         
 
-
         self.connect(self.btn_exit, SIGNAL("clicked()"), 
                 self.reject)
+
 
         return self.exec_()
 
