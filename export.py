@@ -686,7 +686,7 @@ class Export(QDialog):
                 fm = QFontMetrics(serif_font)
                 fm_height = int(fm.height() * 8.5)
 
-                left_margin = 100
+                left_margin = 75
                 x = left_margin
                 include_header = False
                 if self.btn_check_header.isChecked():

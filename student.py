@@ -622,85 +622,63 @@ class Student(QTreeView):
         query = QSqlQuery()
         query.prepare("SELECT * \
                        FROM away a \
-                       INNER JOIN topic t USING(topic_id) \
                        WHERE student_id = :stid AND \
-                             mark_group = :group \
-                       ORDER BY t.topic_name, mark_date DESC")
+                             away_period = :period \
+                       ORDER BY a.away_date DESC")
         query.bindValue(":stid", self.stid)
-        query.bindValue(":group", mark_group)
+        query.bindValue(":period", mark_group)
 
         if query.exec_():
             record = query.record()
             if not record.isEmpty():
-                self.table_view.setRowCount(query.size())
+                self.table_view_away.setRowCount(query.size())
                 nb_row = query.size()
                 items = []
                 for r in range(0, nb_row):
-                    self.table_view.setRowHeight(r, 20)
+                    self.table_view_away.setRowHeight(r, 20)
                 while query.next():
                     row = {}
-                    mark_id = query.value(record.indexOf("mark_id")).toInt()[0]
-                    mark_mark = query.value(record.indexOf("mark_mark")).toDouble()[0]
-                    mark_level = query.value(record.indexOf("mark_level")).toInt()[0]
-                    mark_observation = query.value(record.indexOf("mark_observation")).toString()
+                    away_id = query.value(record.indexOf("away_id")).toInt()[0]
+                    away_justify = query.value(record.indexOf("away_justify")).toString()
+                    away_motif = query.value(record.indexOf("away_motif")).toString()
 
-                    mark_date_string = query.value(record.indexOf("mark_date")).toString()
+                    away_date_string = query.value(record.indexOf("away_date")).toString()
                     l_date = mark_date_string.split("/")
                     y = l_date[2].toInt()[0]
                     m = l_date[1].toInt()[0]
                     d = l_date[0].toInt()[0]
                     new_date = QDate(y, m, d)
-                    mark_date_edit = QDateEdit(new_date)
-                    mark_date_edit.setCalendarPopup(True)
-                    mark_date_edit.setDisplayFormat(u"dd/MM/yyyy")
+                    away_date_edit = QDateEdit(new_date)
+                    away_date_edit.setCalendarPopup(True)
+                    away_date_edit.setDisplayFormat(u"dd/MM/yyyy")
 
-                    topic_id = query.value(record.indexOf("topic_id")).toInt()[0]
 
-                    #item_name = QTableWidgetItem(topic_name)
-                    #item_name.setData(Qt.AccessibleTextRole, QVariant(topic_id))
-
-                    row['mark_id'] = mark_id
-                    row['mark_mark'] = mark_mark 
-                    row['mark_level'] = mark_level
-                    row['mark_observation'] = mark_observation
-                    row['mark_date'] = mark_date_edit 
-                    row['topic_id'] = topic_id 
+                    row['away_id'] = away_id
+                    row['away_date'] = away_date_edit
+                    row['away_justify'] = away_justify
+                    row['away_motif'] = away_motif
                     items.append(row)
              
 
                 for i in range(0, len(items)):
+                    self.table_view_away.setCellWidget(i, 0, items[i]['away_date'])
 
-                    combo_topic = QComboBox()
-                    if self.combo_classroom.currentIndex() != -1:
-                        cr_index = self.combo_classroom.currentIndex()
-                        crid = self.combo_classroom.itemData(cr_index).toInt()[0]
-                        topics = topic.Topic.getAllTopicsByClassroomId(crid)
-                        for t in topics:
-                            combo_topic.addItem(t['topic_name'], QVariant(t['topic_id']))
-                        mark_topic_name = topic.Topic.getNameById(items[i]['topic_id']) 
-                        index = combo_topic.findText(mark_topic_name)
-                        combo_topic.setCurrentIndex(index)
+                    combo_justify = QComboBox()
+                    comob_justify.addItem(u"Non Justifiées")
+                    comob_justify.addItem(u"Justifiées")
+                    mark_topic_name = topic.Topic.getNameById(items[i]['topic_id']) 
+                    index = combo_justity.findText(items[i]["away_justify"])
+                    combo_justify.setCurrentIndex(index)
 
-                    self.table_view.setCellWidget(i, 0, combo_topic)
+                    self.table_view_away.setCellWidget(i, 1, combo_justify)
 
 
-
-                    spin_mark = QDoubleSpinBox()
-                    #spin_mark.setMinimum(1)
-                    spin_mark.setValue(items[i]['mark_mark'])
-                    self.table_view.setCellWidget(i, 1, spin_mark)
-
-                    spin_level = QSpinBox()
-                    spin_level.setMinimum(1)
-                    spin_level.setValue(items[i]['mark_level'])
-                    self.table_view.setCellWidget(i, 2, spin_level)
                     
-                    item_observation = QTableWidgetItem(items[i]['mark_observation'])
-                    item_observation.setData(Qt.AccessibleTextRole, QVariant(items[i]['mark_id']))
-                    self.table_view.setItem(i, 3, item_observation)
+                    item_motif = QTableWidgetItem(items[i]['mark_observation'])
+                    item_motif.setData(Qt.AccessibleTextRole, QVariant(items[i]['away_id']))
+                    self.table_view_away.setItem(i, 2, item_motif)
 
 
-                    self.table_view.setCellWidget(i, 4, items[i]['mark_date'])
 
 
 
