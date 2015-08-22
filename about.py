@@ -79,7 +79,7 @@ class About(QDialog):
             u"à l'implementation de cette amelioration.<br/>"
             u"<h4>4. Prix</h4>"
             u"Le Bénéficiaire devra payer le prix du logiciel conformément aux modalités de paiement prévu "
-            u"et facturé de façon raisonnable par le propriétaire du logiciel pour l'installation du logiciel. "
+            u"et facturé de façon raisonnable par le Propriétaire du logiciel pour l'installation du logiciel. "
             u"Le paiement s'effectuera en intégralité sans quelque droit de compensation ou réduction et le Bénéficiaire paiera le prix et les eventuels frais au plus tard 30 jours aprés la période de test ou d'essai."
             ))
 
