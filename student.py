@@ -133,6 +133,9 @@ class Student(QTreeView):
         if self.btn_save:
            self.btn_save.setEnabled(True)
    
+    def activeSaveAwayBtn(self):
+        if self.btn_save_away:
+           self.btn_save_away.setEnabled(True)
 
     def activeNewAndCancelBtn(self):
         if self.combo_classroom.currentIndex() != -1:
@@ -160,6 +163,34 @@ class Student(QTreeView):
         self.activeDeleteBtn()
 
 
+
+    def activeNewAndCancelAwayBtn(self):
+        if self.combo_classroom.currentIndex() != -1:
+            self.btn_new_row_away.setEnabled(True)
+            self.btn_cancel_away.setEnabled(True)
+            if self.btn_save_away:
+                self.btn_save_away.setEnabled(True)
+        else:
+            self.btn_new_row_away.setEnabled(False)
+            self.btn_cancel_away.setEnabled(False)
+            if self.btn_save_away:
+                self.btn_save_away.setEnabled(False)
+
+        self.table_view_away.setRowCount(0)
+        self.activeDeleteAwayBtn()
+
+
+    def activeDeleteAwayBtn(self):
+        if self.combo_classroom.currentIndex() != -1:
+            if self.table_view_away.currentRow() >= 0:
+                self.btn_delete_row_away.setEnabled(True)
+            else:
+                self.btn_delete_row_away.setEnabled(False)
+
+        else:
+            self.btn_delete_row_away.setEnabled(False)
+
+
     def activeDeleteBtn(self):
         if self.combo_classroom.currentIndex() != -1:
             if self.table_view.currentRow() >= 0:
@@ -169,6 +200,7 @@ class Student(QTreeView):
 
         else:
             self.btn_delete_row.setEnabled(False)
+
 
     def activeOkBtn(self):
         if self.combo_classroom.currentIndex() != -1:
@@ -607,6 +639,7 @@ class Student(QTreeView):
 
 
 
+
     def setTableAwayByStudentIdAndByMarkGroup(self, group_index):
         if self.combo_classroom.currentIndex() == -1 or self.stid == None:
             return
@@ -617,7 +650,7 @@ class Student(QTreeView):
             if self.isStudentHasMarksInThisClassroomId(crid) == False:
                 return
 
-        mark_group = self.combo_mark_group.currentText()
+        mark_group = self.combo_mark_group_away.currentText()
 
         query = QSqlQuery()
         query.prepare("SELECT * \
@@ -674,7 +707,7 @@ class Student(QTreeView):
 
 
                     
-                    item_motif = QTableWidgetItem(items[i]['mark_observation'])
+                    item_motif = QTableWidgetItem(items[i]['away_motif'])
                     item_motif.setData(Qt.AccessibleTextRole, QVariant(items[i]['away_id']))
                     self.table_view_away.setItem(i, 2, item_motif)
 
@@ -682,20 +715,14 @@ class Student(QTreeView):
 
 
 
-                    self.connect(combo_topic, SIGNAL("currentIndexChanged(int)"), 
+                    self.connect(combo_justify, SIGNAL("currentIndexChanged(int)"), 
                                      self.activeSaveBtn)
 
-                    self.connect(spin_mark, SIGNAL("valueChanged(double)"), 
-                                     self.activeSaveBtn)
-
-                    self.connect(spin_level, SIGNAL("valueChanged(int)"), 
-                                     self.activeSaveBtn)
-
-                    self.connect(items[i]['mark_date'], SIGNAL("dateChanged(QDate)"), 
+                    self.connect(items[i]['away_date'], SIGNAL("dateChanged(QDate)"), 
                                      self.activeSaveBtn)
 
 
-        self.table_view.sortItems(4)
+        self.table_view_away.sortItems(0)
 
 
 
@@ -1135,6 +1162,7 @@ class Student(QTreeView):
             self.combo_class.addItem(c['class_name'], QVariant(c['class_id']))
    
 
+
     def setMarkGroupComboBoxByAcademicYearId(self, ay_index):
         if self.combo_classroom.currentIndex() != -1:
             #cr_index = self.combo_classroom.currentIndex()
@@ -1144,15 +1172,39 @@ class Student(QTreeView):
             #classes = self.getClassesByAcademicYearId(ay_id)
             period = academicyear.AcademicYear.getPeriodById(ay_id)
             self.combo_mark_group.clear()
+            try:
+                self.combo_mark_group_away.clear()
+            except:
+                pass
             if period == 'quarter':
                 self.combo_mark_group.addItem(u"1er Trimestre")
                 self.combo_mark_group.addItem(u"2ème Trimestre")
                 self.combo_mark_group.addItem(u"3ème Trimestre")
+
+                try:
+                    self.combo_mark_group_away.addItem(u"1er Trimestre")
+                    self.combo_mark_group_away.addItem(u"2ème Trimestre")
+                    self.combo_mark_group_away.addItem(u"3ème Trimestre")
+                except:
+                    pass
+
             elif period == 'semester':
-                self.combo_mark_group.addItem(u"1er Semestre")
-                self.combo_mark_group.addItem(u"2ème Semestre")
+                try:
+                    self.combo_mark_group.addItem(u"1er Semestre")
+                    self.combo_mark_group.addItem(u"2ème Semestre")
+                except:
+                    pass
+
+
+                self.combo_mark_group_away.addItem(u"1er Semestre")
+                self.combo_mark_group_away.addItem(u"2ème Semestre")
+
         else:
             self.combo_mark_group.clear()
+            try:
+                self.combo_mark_group_away.clear()
+            except:
+                pass
 
 
 
@@ -1336,6 +1388,7 @@ class Student(QTreeView):
 
         self.combo_mark_group = QComboBox()
         self.combo_mark_group.setMinimumWidth(200)
+        self.combo_mark_group.setSizeAdjustPolicy(QComboBox.AdjustToContents) 
 
         layout_mark_group = QFormLayout()
         layout_mark_group.addRow(u"Période: ", self.combo_mark_group)
@@ -1471,15 +1524,18 @@ class Student(QTreeView):
 
         self.combo_ay = QComboBox()
         self.combo_ay.setMinimumWidth(200)
+        self.combo_ay.setSizeAdjustPolicy(QComboBox.AdjustToContents) 
         self.updateAcademicYearComboBox()
 
 
 
         self.combo_class = QComboBox()
         self.combo_class.setMinimumWidth(200)
+        self.combo_class.setSizeAdjustPolicy(QComboBox.AdjustToContents) 
 
         self.combo_classroom = QComboBox()
         self.combo_classroom.setMinimumWidth(200)
+        self.combo_classroom.setSizeAdjustPolicy(QComboBox.AdjustToContents) 
 
         label_ay = QLabel(u"Année academique: ")
         label_class = QLabel(u"Classe: ")
@@ -1690,11 +1746,14 @@ class Student(QTreeView):
 
         self.combo_mark_group = QComboBox()
         self.combo_mark_group.setMinimumWidth(200)
-        self.setMarkGroupComboBoxByAcademicYearId(ay_index)
+        self.combo_mark_group.setSizeAdjustPolicy(QComboBox.AdjustToContents) 
+
+        #self.setMarkGroupComboBoxByAcademicYearId(ay_index)
 
         layout_mark_group = QFormLayout()
         layout_mark_group.addRow(u"Période: ", self.combo_mark_group)
-        self.setTableMarksByStudentIdAndByMarkGroup(0)
+
+        #self.setTableMarksByStudentIdAndByMarkGroup(0)
 
 
 
@@ -1745,7 +1804,7 @@ class Student(QTreeView):
 
         
         self.btn_save_away = QPushButton(u"Enregistrer tout")
-        self.btn_new_row_away = QPushButton(u"Nouvelle abscence")
+        self.btn_new_row_away = QPushButton(u"Nouvelle absence")
         self.btn_delete_row_away = QPushButton(u"Supprimer")
         self.btn_cancel_away = QPushButton(u"Annuler")
 
@@ -1760,17 +1819,23 @@ class Student(QTreeView):
         self.btn_delete_row_away.setIcon(QIcon(":/images/button_remove.png"))
         self.btn_cancel_away.setIcon(QIcon(":/images/button_cancel.png"))
 
-        self.activeNewAndCancelBtn()
+        self.activeNewAndCancelAwayBtn()
 
 
-        self.combo_mark_group = QComboBox()
-        self.combo_mark_group.setMinimumWidth(200)
+        self.combo_mark_group_away = QComboBox()
+        self.combo_mark_group_away.setMinimumWidth(200)
+        self.combo_mark_group_away.setSizeAdjustPolicy(QComboBox.AdjustToContents) 
+
         self.setMarkGroupComboBoxByAcademicYearId(ay_index)
 
         layout_mark_group = QFormLayout()
-        layout_mark_group.addRow(u"Période: ", self.combo_mark_group)
+        layout_mark_group.addRow(u"Période: ", self.combo_mark_group_away)
 
-        #self.setTableAwayByStudentIdAndByMarkGroup(0)
+
+
+        self.setTableMarksByStudentIdAndByMarkGroup(0)
+        self.setTableAwayByStudentIdAndByMarkGroup(0)
+
 
 
 
@@ -1798,13 +1863,12 @@ class Student(QTreeView):
 
 
 
-
         
         # add the pages to the onglet
         onglets = QTabWidget()
         onglets.addTab(page_info, "Information personnelles")
         onglets.addTab(page_mark, "Notes")
-        onglets.addTab(page_away, "Abscence")
+        onglets.addTab(page_away, "Absence")
 
 
 
@@ -1850,6 +1914,18 @@ class Student(QTreeView):
         self.connect(self.combo_mark_group, SIGNAL("activated(int)"), 
                 self.setTableMarksByStudentIdAndByMarkGroup)
 
+
+        
+
+        self.connect(self.combo_mark_group_away, SIGNAL("currentIndexChanged(int)"), 
+                self.setTableAwayByStudentIdAndByMarkGroup)
+
+        self.connect(self.combo_mark_group_away, SIGNAL("activated(int)"), 
+                self.setTableAwayByStudentIdAndByMarkGroup)
+
+
+
+
         self.connect(self.combo_classroom, SIGNAL("currentIndexChanged(int)"), 
                 self.activeOkBtn)
 
@@ -1857,16 +1933,28 @@ class Student(QTreeView):
         self.connect(self.combo_classroom, SIGNAL("currentIndexChanged(int)"), 
                 self.activeNewAndCancelBtn)
 
+        self.connect(self.combo_classroom, SIGNAL("currentIndexChanged(int)"), 
+                self.activeNewAndCancelAwayBtn)
+
         self.connect(self.table_view, SIGNAL("itemClicked(QTableWidgetItem *)"), 
                 self.activeDeleteBtn)
+
+        self.connect(self.table_view_away, SIGNAL("itemClicked(QTableWidgetItem *)"), 
+                self.activeDeleteAwayBtn)
 
         self.connect(self.table_view, SIGNAL("currentItemChanged(QTableWidgetItem *, \
                                                                  QTableWidgetItem *)"), 
                 self.activeDeleteBtn)
 
+        self.connect(self.table_view_away, SIGNAL("currentItemChanged(QTableWidgetItem *, \
+                                                                 QTableWidgetItem *)"), 
+                self.activeDeleteAwayBtn)
+
         self.connect(self.table_view, SIGNAL("cellChanged(int, int)"), 
                 self.activeSaveBtn)
 
+        self.connect(self.table_view_away, SIGNAL("cellChanged(int, int)"), 
+                self.activeSaveAwayBtn)
 
 
         self.connect(self.btn_save, SIGNAL("clicked()"), 
