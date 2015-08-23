@@ -291,6 +291,54 @@ class Student(QTreeView):
             child.widget().deleteLater()
 
 
+
+
+
+    def addNewAwayRow(self):
+        nb_row = self.table_view_away.rowCount()
+
+        nb = nb_row + 1
+        self.table_view_away.insertRow(nb_row)
+        self.table_view_away.setRowHeight(nb_row, 20)
+
+        combo_justify = QComboBox()
+        combo_justify.addItem(u"Non Justifiée")
+        combo_justify.addItem(u"Justifiée")
+
+
+        date_edit = QDateTimeEdit()
+        date_edit.setCalendarPopup(True)
+        date_edit.setDisplayFormat(u"dd/MM/yyyy")
+
+        time_from_edit = QTimeEdit()
+        time_from_edit.setDisplayFormat(u"hh:mm")
+
+        time_to_edit = QTimeEdit()
+        time_to_edit.setDisplayFormat(u"hh:mm")
+
+        self.table_view_away.setCellWidget(nb_row, 0, date_edit)
+        self.table_view_away.setCellWidget(nb_row, 1, time_from_edit)
+        self.table_view_away.setCellWidget(nb_row, 2, time_to_edit)
+        self.table_view_away.setCellWidget(nb_row, 3, combo_justify)
+        self.table_view_away.setItem(nb_row, 4, QTableWidgetItem())
+
+
+        self.connect(combo_justify, SIGNAL("currentIndexChanged(int)"), 
+                                     self.activeSaveAwayBtn)
+
+        self.connect(date_edit, SIGNAL("dateChanged(QDate)"), 
+                                     self.activeSaveAwayBtn)
+
+
+        self.connect(time_from_edit, SIGNAL("timeChanged(QTime)"), 
+                                     self.activeSaveAwayBtn)
+
+        self.connect(time_to_edit, SIGNAL("timeChanged(QTime)"), 
+                                     self.activeSaveAwayBtn)
+
+
+
+
     def updateOldMark(self, mark_id, mark_mark, mark_level,
                             mark_observation, mark_date, mark_group, stid, tid, crid, ayid):
         query = QSqlQuery()
@@ -1790,16 +1838,20 @@ class Student(QTreeView):
 
         self.table_view_away.setShowGrid(False)
         self.table_view_away.setTabKeyNavigation(True)
-        self.table_view_away.setColumnCount(3)
+        self.table_view_away.setColumnCount(5)
 
         headers = []
         headers.append(u"Date")
+        headers.append(u"De (Heure)")
+        headers.append(u"À (Heure)")
         headers.append(u"Justification")
-        headers.append(u"Motif")
+        headers.append(u"Motif si justifiée")
         self.table_view_away.setHorizontalHeaderLabels(headers)
-        self.table_view_away.setColumnWidth(0, 200)
-        self.table_view_away.setColumnWidth(1, 200)
-        self.table_view_away.setColumnWidth(2, 200)
+        self.table_view_away.setColumnWidth(0, 100)
+        self.table_view_away.setColumnWidth(1, 100)
+        self.table_view_away.setColumnWidth(2, 100)
+        self.table_view_away.setColumnWidth(3, 80)
+        self.table_view_away.setColumnWidth(4, 250)
 
 
         
@@ -1957,11 +2009,17 @@ class Student(QTreeView):
                 self.activeSaveAwayBtn)
 
 
+
+
+
         self.connect(self.btn_save, SIGNAL("clicked()"), 
                 self.onClickedSaveBtn)
 
         self.connect(self.btn_new_row, SIGNAL("clicked()"), 
                 self.addNewMarkRow)
+
+        self.connect(self.btn_new_row_away, SIGNAL("clicked()"), 
+                self.addNewAwayRow)
 
         self.connect(self.btn_delete_row, SIGNAL("clicked()"), 
                 self.deleteRow)
