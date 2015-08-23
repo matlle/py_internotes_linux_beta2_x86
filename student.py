@@ -37,6 +37,7 @@ class Student(QTreeView):
         self.infos = None
         self.list_room_id = []
         self.list_removables_marks = []
+        self.list_removables_aways = []
 
 
         #self.updateStudentTree()
@@ -214,6 +215,11 @@ class Student(QTreeView):
         self.setTableMarksByStudentIdAndByMarkGroup(0)
         self.list_removables_marks = []
 
+    def cancelAllAway(self):
+        #self.table_view.setRowCount(0)
+        self.setTableAwayByStudentIdAndByMarkGroup(0)
+        self.list_removables_aways = []
+
 
     def deleteRow(self):
         row = self.table_view.currentRow()
@@ -234,6 +240,17 @@ class Student(QTreeView):
         if child:
             child.widget().deleteLater()
         
+
+    def deleteAwayRow(self):
+        row = self.table_view_away.currentRow()
+
+        id = self.table_view_away.item(row, 4).data(Qt.AccessibleTextRole).toInt()[0]
+        if id:
+            self.list_removables_aways.append(id)
+
+        self.table_view_away.removeRow(row)
+        self.activeDeleteAwayBtn()
+        self.activeSaveAwayBtn()
 
 
 
@@ -724,7 +741,7 @@ class Student(QTreeView):
                     away_motif = query.value(record.indexOf("away_motif")).toString()
 
                     away_date_string = query.value(record.indexOf("away_date")).toString()
-                    l_date = mark_date_string.split("/")
+                    l_date = away_date_string.split("/")
                     y = l_date[2].toInt()[0]
                     m = l_date[1].toInt()[0]
                     d = l_date[0].toInt()[0]
@@ -734,8 +751,29 @@ class Student(QTreeView):
                     away_date_edit.setDisplayFormat(u"dd/MM/yyyy")
 
 
+                    away_time_from_string = query.value(record.indexOf("away_time_from")).toString()
+                    l_time = away_time_from_string.split(":") 
+                    h = l_time[0].toInt()[0]
+                    m = l_time[1].toInt()[0]
+                    new_time = QTime(h, m)
+                    away_time_from_edit = QTimeEdit()
+                    away_time_from_edit.setDisplayFormat(u"hh:mm")
+                    away_time_from_edit.setTime(new_time)
+
+
+                    away_time_to_string = query.value(record.indexOf("away_time_to")).toString()
+                    l_time = away_time_to_string.split(":") 
+                    h = l_time[0].toInt()[0]
+                    m = l_time[1].toInt()[0]
+                    new_time = QTime(h, m)
+                    away_time_to_edit = QTimeEdit()
+                    away_time_to_edit.setDisplayFormat(u"hh:mm")
+                    away_time_to.setTime(new_time)
+
                     row['away_id'] = away_id
                     row['away_date'] = away_date_edit
+                    row['away_time_from'] = away_time_from_edit
+                    row['away_time_to'] = away_time_to_edit
                     row['away_justify'] = away_justify
                     row['away_motif'] = away_motif
                     items.append(row)
@@ -1850,7 +1888,7 @@ class Student(QTreeView):
         self.table_view_away.setColumnWidth(0, 100)
         self.table_view_away.setColumnWidth(1, 100)
         self.table_view_away.setColumnWidth(2, 100)
-        self.table_view_away.setColumnWidth(3, 80)
+        self.table_view_away.setColumnWidth(3, 100)
         self.table_view_away.setColumnWidth(4, 250)
 
 
@@ -2024,9 +2062,14 @@ class Student(QTreeView):
         self.connect(self.btn_delete_row, SIGNAL("clicked()"), 
                 self.deleteRow)
 
+        self.connect(self.btn_delete_row_away, SIGNAL("clicked()"), 
+                self.deleteAwayRow)
+
         self.connect(self.btn_cancel_notes, SIGNAL("clicked()"), 
                 self.cancelAll)
 
+        self.connect(self.btn_cancel_away, SIGNAL("clicked()"), 
+                self.cancelAllAway)
 
         self.connect(self.btn_photo, SIGNAL("clicked()"), self.selectPhoto)
         self.connect(self.btn_ok, SIGNAL("clicked()"), dialog.accept)
