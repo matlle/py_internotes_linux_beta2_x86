@@ -448,6 +448,85 @@ class Student(QTreeView):
                 child.widget().deleteLater()
 
 
+
+
+
+    def updateOldAway(self, away_id, away_date, away_time_from,
+                            away_time_to, away_justify, away_motif,
+                            away_period, stid):
+        query = QSqlQuery()
+        query.prepare("UPDATE away \
+                       SET away_date = :date, \
+                           away_time_from = :time_from, \
+                           away_time_to = :time_to, \
+                           away_justify = :justify, \
+                           away_motif = :motify, \
+                           away_period = :period, \
+                           student_id = :stid, \
+                           away_updated_at = NOW() \
+                       WHERE away_id = :aid")
+
+        query.bindValue(":aid", away_id)
+        query.bindValue(":date", away_date)
+        query.bindValue(":time_from", away_time_from)
+        query.bindValue(":time_to", away_time_to)
+        query.bindValue(":justify", away_justify)
+        query.bindValue(":motif", away_motif)
+        query.bindValue(":period", away_period)
+        query.bindValue(":stid", stid)
+
+        if not query.exec_():
+            QMessageBox.critical(self, "Error - InterNotes", 
+                    u"Database Error: %s" % query.lastError().text())
+
+
+
+
+    def insertNewAway(self, away_date, away_time_from,
+                            away_time_to, away_justify, away_motif,
+                            away_period, stid):
+        query = QSqlQuery()
+        query.prepare("INSERT INTO away \
+                           (away_date, \
+                            away_time_from, \
+                            away_time_to, \
+                            away_justify, \
+                            away_motif, \
+                            away_period, \
+                            student_id, \
+                            away_created_at) \
+                           VALUES(:date, \
+                                  :time_from, \
+                                  :time_to, \
+                                  :justify, \
+                                  :motif, \
+                                  :period, \
+                                  :stid, \
+                                  NOW() \
+                                 ) \
+                       ")
+
+        query.bindValue(":date", away_date)
+        query.bindValue(":time_from", away_time_from)
+        query.bindValue(":time_to", away_time_to)
+        query.bindValue(":justify", away_justify)
+        query.bindValue(":motif", away_motif)
+        query.bindValue(":period", away_period)
+        query.bindValue(":stid", stid)
+
+        if not query.exec_():
+            QMessageBox.critical(self, "Error - InterNotes", 
+                    u"Database Error: %s" % query.lastError().text())
+        else:
+            return query.lastInsertId().toInt()[0]
+
+
+
+
+
+
+
+
     def deleteRemovablesMarks(self):
         list_id = self.list_removables_marks
         s = ''
@@ -478,6 +557,30 @@ class Student(QTreeView):
                 child = self.stat_page.stat_output.layout.takeAt(0)
                 if child:
                     child.widget().deleteLater()
+
+
+
+
+    def deleteRemovablesAways(self):
+        list_id = self.list_removables_marks
+        s = ''
+        if list_id:
+            if len(list_id) == 1:
+                s = '= ' + str(list_id[0])
+            else:
+                for m in range(0, len(list_id)):
+                    if m + 1 == len(list_id):
+                        s += '= ' + str(list_id[m])
+                    else:
+                        s += '= ' + str(list_id[m]) + " OR away_id "
+            
+            sql = "DELETE FROM away WHERE away_id " + s
+            
+            query = QSqlQuery(sql)
+
+            if not query.exec_():
+                QMessageBox.critical(self, "Error - InterNotes",
+                        u"Date Error: %s " % query.lastError().text())
 
 
 
@@ -517,6 +620,38 @@ class Student(QTreeView):
 
 
 
+    def saveAways(self, away_data, stid, flag=False):
+        if len(away_data) > 0:
+            for a in range(0, len(away_data)):
+                """
+                if away_data[a]['away_date'] <= 1:
+                    QMessageBox.critical(self, u"Error - InterNotes",
+                                         u"Veuillez renseigner " + 
+                                         u"la date et les heures pour chaque absence")
+                    return
+                """
+                if 'away_id' in away_data[a]:
+                    self.updateOldAway(away_data[a]['away_id'], away_data[a]['away_date'], 
+                               away_data[a]['away_time_from'], away_data[m]['away_time_to'], 
+                               away_data[a]['away_justify'],
+                               away_data[a]['away_motif'], away_data[m]['away_period'], stid) 
+
+                else:
+                    aid = self.insertNewAway(away_data[a]['away_date'], away_data[a]['away_time_from'],
+                                away_data[a]['away_time_to'], 
+                                away_data[a]['away_justify'], away_data[a]['away_motif'],
+                                away_data[a]['away_period'], stid)
+
+                    # put the new away_id here
+                    if flag == True:
+                        item_motif = away_data[a]['item_motif']
+                        item_motif.setData(Qt.AccessibleTextRole, 
+                                   QVariant(aid))
+
+
+
+
+
 
     def onClickedSaveBtn(self):
         data = self.getAllNewMarksFromTableView()     
@@ -529,6 +664,14 @@ class Student(QTreeView):
    
 
 
+    def onClickedSaveAwayBtn(self):
+        data = self.getAllNewAwaysFromTableView() 
+        if not data:
+            return
+        self.saveAways(data, self.stid, True)
+        if self.btn_save_away:
+            self.btn_save_away.setEnabled(False)
+        self.deleteRemovablesAways()
 
 
 
@@ -561,7 +704,8 @@ class Student(QTreeView):
                     mark['item_observation'] = self.table_view.item(r, 3)
                     mark['mark_observation'] = self.table_view.item(r, 3).text()
 
-                    self.student_birth_date.date().toString("dd/MM/yyyy"),
+                    #self.student_birth_date.date().toString("dd/MM/yyyy"),
+
                     date_edit = self.table_view.cellWidget(r, 4)
                     mark['mark_date'] = date_edit.date().toString("dd/MM/yyyy")
 
@@ -574,6 +718,51 @@ class Student(QTreeView):
         return marks
 
 
+
+
+
+    def getAllNewAwaysFromTableView(self):
+        aways = []
+        if self.combo_classroom.currentIndex() != -1:
+
+            mark_group = self.combo_mark_group_away.currentText()
+
+            if self.table_view_away.rowCount() > 0:
+                nb_row = self.table_view_away.rowCount()
+                for r in range(0, nb_row):
+                    away = {}
+                    date_edit = self.table_view_away.cellWidget(r, 0)
+                    away['away_date'] = date_edit.date().toString("dd/MM/yyyy")
+
+                    time_from_edit = self.table_view_away.cellWidget(r, 1)
+                    away['away_time_from'] = time_from_edit.time().toString("hh:mm")
+
+                    time_to_edit = self.table_view_away.cellWidget(r, 2)
+                    away['away_time_to'] = time_to_edit.time().toString("hh:mm")
+
+
+                    combo_justify = self.table_view_away.cellWidget(r, 3)
+                    away['away_justify'] = combo_justify.currentText() 
+
+                    away_id = self.table_view_away.item(r, 4).data(Qt.AccessibleTextRole).toInt()[0]
+                    if away_id:
+                        away['away_id'] = away_id 
+
+                    away['item_motif'] = self.table_view_away.item(r, 4)
+                    away['away_motif'] = self.table_view_away.item(r, 4).text()
+
+                    #self.student_birth_date.date().toString("dd/MM/yyyy"),
+
+                    away['away_period'] = mark_group 
+
+                    aways.append(away)
+        
+        return aways
+
+
+
+
+
     def isStudentHasMarksInThisClassroomId(self, crid):
         query = QSqlQuery("SELECT * FROM mark WHERE classroom_id = " + str(crid))
         if query.exec_():
@@ -581,6 +770,7 @@ class Student(QTreeView):
                 return True
             else:
                 return False
+
 
     def setTableMarksByClassroomIndexChanged(self):
         mark_group_index = self.combo_mark_group.currentIndex()
@@ -768,7 +958,7 @@ class Student(QTreeView):
                     new_time = QTime(h, m)
                     away_time_to_edit = QTimeEdit()
                     away_time_to_edit.setDisplayFormat(u"hh:mm")
-                    away_time_to.setTime(new_time)
+                    away_time_to_edit.setTime(new_time)
 
                     row['away_id'] = away_id
                     row['away_date'] = away_date_edit
@@ -782,20 +972,21 @@ class Student(QTreeView):
                 for i in range(0, len(items)):
                     self.table_view_away.setCellWidget(i, 0, items[i]['away_date'])
 
+                    self.table_view_away.setCellWidget(i, 1, items[i]['away_time_from'])
+                    self.table_view_away.setCellWidget(i, 2, items[i]['away_time_to'])
+
                     combo_justify = QComboBox()
-                    comob_justify.addItem(u"Non Justifiées")
-                    comob_justify.addItem(u"Justifiées")
-                    mark_topic_name = topic.Topic.getNameById(items[i]['topic_id']) 
-                    index = combo_justity.findText(items[i]["away_justify"])
+                    combo_justify.addItem(u"Non Justifiées")
+                    combo_justify.addItem(u"Justifiées")
+                    index = combo_justify.findText(items[i]["away_justify"])
                     combo_justify.setCurrentIndex(index)
 
-                    self.table_view_away.setCellWidget(i, 1, combo_justify)
-
+                    self.table_view_away.setCellWidget(i, 3, combo_justify)
 
                     
                     item_motif = QTableWidgetItem(items[i]['away_motif'])
                     item_motif.setData(Qt.AccessibleTextRole, QVariant(items[i]['away_id']))
-                    self.table_view_away.setItem(i, 2, item_motif)
+                    self.table_view_away.setItem(i, 4, item_motif)
 
 
 
@@ -1447,7 +1638,7 @@ class Student(QTreeView):
         headers.append(u"Date")
         self.table_view.setHorizontalHeaderLabels(headers)
         self.table_view.setColumnWidth(0, 150)
-        self.table_view.setColumnWidth(1, 70)
+        self.table_view.setColumnWidth(1, 80)
         self.table_view.setColumnWidth(2, 110)
         self.table_view.setColumnWidth(3, 150)
         self.table_view.setColumnWidth(4, 150)
@@ -2052,6 +2243,9 @@ class Student(QTreeView):
 
         self.connect(self.btn_save, SIGNAL("clicked()"), 
                 self.onClickedSaveBtn)
+
+        self.connect(self.btn_save_away, SIGNAL("clicked()"), 
+                self.onClickedSaveAwayBtn)
 
         self.connect(self.btn_new_row, SIGNAL("clicked()"), 
                 self.addNewMarkRow)
