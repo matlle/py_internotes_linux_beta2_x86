@@ -460,7 +460,7 @@ class Student(QTreeView):
                            away_time_from = :time_from, \
                            away_time_to = :time_to, \
                            away_justify = :justify, \
-                           away_motif = :motify, \
+                           away_motif = :motif, \
                            away_period = :period, \
                            student_id = :stid, \
                            away_updated_at = NOW() \
@@ -632,9 +632,9 @@ class Student(QTreeView):
                 """
                 if 'away_id' in away_data[a]:
                     self.updateOldAway(away_data[a]['away_id'], away_data[a]['away_date'], 
-                               away_data[a]['away_time_from'], away_data[m]['away_time_to'], 
+                               away_data[a]['away_time_from'], away_data[a]['away_time_to'], 
                                away_data[a]['away_justify'],
-                               away_data[a]['away_motif'], away_data[m]['away_period'], stid) 
+                               away_data[a]['away_motif'], away_data[a]['away_period'], stid) 
 
                 else:
                     aid = self.insertNewAway(away_data[a]['away_date'], away_data[a]['away_time_from'],
@@ -976,8 +976,8 @@ class Student(QTreeView):
                     self.table_view_away.setCellWidget(i, 2, items[i]['away_time_to'])
 
                     combo_justify = QComboBox()
-                    combo_justify.addItem(u"Non Justifiées")
-                    combo_justify.addItem(u"Justifiées")
+                    combo_justify.addItem(u"Non Justifiée")
+                    combo_justify.addItem(u"Justifiée")
                     index = combo_justify.findText(items[i]["away_justify"])
                     combo_justify.setCurrentIndex(index)
 
@@ -989,14 +989,19 @@ class Student(QTreeView):
                     self.table_view_away.setItem(i, 4, item_motif)
 
 
+                    self.connect(items[i]['away_time_from'], SIGNAL("timeChanged(QTime)"), 
+                                     self.activeSaveAwayBtn)
+
+                    self.connect(items[i]['away_time_to'], SIGNAL("timeChanged(QTime)"), 
+                                     self.activeSaveAwayBtn)
 
 
+                    self.connect(items[i]['away_date'], SIGNAL("dateChanged(QDate)"), 
+                                     self.activeSaveBtn)
 
                     self.connect(combo_justify, SIGNAL("currentIndexChanged(int)"), 
                                      self.activeSaveBtn)
 
-                    self.connect(items[i]['away_date'], SIGNAL("dateChanged(QDate)"), 
-                                     self.activeSaveBtn)
 
 
         self.table_view_away.sortItems(0)
