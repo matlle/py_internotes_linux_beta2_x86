@@ -623,13 +623,19 @@ class Student(QTreeView):
     def saveAways(self, away_data, stid, flag=False):
         if len(away_data) > 0:
             for a in range(0, len(away_data)):
-                """
-                if away_data[a]['away_date'] <= 1:
+                l_from = away_data[a]['away_time_from'].split(":") 
+                h_from = l_from[0].toInt()[0]
+
+                l_to = away_data[a]['away_time_to'].split(":") 
+                h_to = l_to[0].toInt()[0]
+
+                if h_from > h_to:
                     QMessageBox.critical(self, u"Error - InterNotes",
-                                         u"Veuillez renseigner " + 
-                                         u"la date et les heures pour chaque absence")
+                                         u"Pour chaque absence, " + 
+                                         u"l'heure de départ doit être inférieur à l'heure d'arrivée")
                     return
-                """
+
+
                 if 'away_id' in away_data[a]:
                     self.updateOldAway(away_data[a]['away_id'], away_data[a]['away_date'], 
                                away_data[a]['away_time_from'], away_data[a]['away_time_to'], 
@@ -3268,8 +3274,8 @@ class Student(QTreeView):
     @staticmethod
     def getVerifiedAways(stid):
         nb = 0
-        query = QSqlQuery("SELECT ROUND(time_to_sec(TIMEDIFF( \
-                                away_time_to, away_time_from)) / 3600) dt \
+        query = QSqlQuery("SELECT ABS(ROUND(time_to_sec(TIMEDIFF( \
+                                away_time_to, away_time_from)) / 3600)) dt \
                            FROM away \
                            WHERE away_justify = 'Justifiée'" + \
                            " AND student_id = " + str(stid))
@@ -3288,8 +3294,8 @@ class Student(QTreeView):
     @staticmethod
     def getUnVerifiedAways(stid):
         nb = 0
-        query = QSqlQuery("SELECT ROUND(time_to_sec(TIMEDIFF( \
-                                away_time_to, away_time_from)) / 3600) dt \
+        query = QSqlQuery("SELECT ABS(ROUND(time_to_sec(TIMEDIFF( \
+                                away_time_to, away_time_from)) / 3600)) dt \
                            FROM away \
                            WHERE away_justify = 'Non Justifiée'" + \
                            " AND student_id = " + str(stid))
