@@ -1643,7 +1643,7 @@ class Student(QTreeView):
         headers.append(u"Date")
         self.table_view.setHorizontalHeaderLabels(headers)
         self.table_view.setColumnWidth(0, 150)
-        self.table_view.setColumnWidth(1, 80)
+        self.table_view.setColumnWidth(1, 100)
         self.table_view.setColumnWidth(2, 110)
         self.table_view.setColumnWidth(3, 150)
         self.table_view.setColumnWidth(4, 150)
@@ -2000,7 +2000,7 @@ class Student(QTreeView):
         headers.append(u"Date")
         self.table_view.setHorizontalHeaderLabels(headers)
         self.table_view.setColumnWidth(0, 150)
-        self.table_view.setColumnWidth(1, 70)
+        self.table_view.setColumnWidth(1, 100)
         self.table_view.setColumnWidth(2, 110)
         self.table_view.setColumnWidth(3, 150)
         self.table_view.setColumnWidth(4, 150)
@@ -3268,8 +3268,8 @@ class Student(QTreeView):
     @staticmethod
     def getVerifiedAways(stid):
         nb = 0
-        query = QSqlQuery("SELECT HOUR(TIMEDIFF( \
-                                away_time_to, away_time_from)) dt \
+        query = QSqlQuery("SELECT ROUND(time_to_sec(TIMEDIFF( \
+                                away_time_to, away_time_from)) / 3600) dt \
                            FROM away \
                            WHERE away_justify = 'Justifiée'" + \
                            " AND student_id = " + str(stid))
@@ -3288,8 +3288,8 @@ class Student(QTreeView):
     @staticmethod
     def getUnVerifiedAways(stid):
         nb = 0
-        query = QSqlQuery("SELECT HOUR(TIMEDIFF( \
-                                away_time_to, away_time_from)) dt \
+        query = QSqlQuery("SELECT ROUND(time_to_sec(TIMEDIFF( \
+                                away_time_to, away_time_from)) / 3600) dt \
                            FROM away \
                            WHERE away_justify = 'Non Justifiée'" + \
                            " AND student_id = " + str(stid))
