@@ -217,7 +217,7 @@ class Student(QTreeView):
 
     def cancelAllAway(self):
         #self.table_view.setRowCount(0)
-        self.setTableAwayByStudentIdAndByMarkGroup(0)
+        self.setTableAwaysByStudentIdAndByMarkGroup(0)
         self.list_removables_aways = []
 
 
@@ -622,7 +622,6 @@ class Student(QTreeView):
 
     def saveAways(self, away_data, stid, flag=False):
         if len(away_data) > 0:
-            print len(away_data)
             for a in range(0, len(away_data)):
                 l_from = away_data[a]['away_time_from'].split(":") 
                 h_from = l_from[0].toInt()[0]
@@ -907,7 +906,7 @@ class Student(QTreeView):
 
 
 
-    def setTableAwayByStudentIdAndByMarkGroup(self, group_index):
+    def setTableAwaysByStudentIdAndByMarkGroup(self, group_index):
         if self.combo_classroom.currentIndex() == -1 or self.stid == None:
             return
         """
@@ -2134,7 +2133,7 @@ class Student(QTreeView):
 
 
         self.setTableMarksByStudentIdAndByMarkGroup(0)
-        self.setTableAwayByStudentIdAndByMarkGroup(0)
+        self.setTableAwaysByStudentIdAndByMarkGroup(0)
 
 
 
@@ -2218,10 +2217,10 @@ class Student(QTreeView):
         
 
         self.connect(self.combo_mark_group_away, SIGNAL("currentIndexChanged(int)"), 
-                self.setTableAwayByStudentIdAndByMarkGroup)
+                self.setTableAwaysByStudentIdAndByMarkGroup)
 
         self.connect(self.combo_mark_group_away, SIGNAL("activated(int)"), 
-                self.setTableAwayByStudentIdAndByMarkGroup)
+                self.setTableAwaysByStudentIdAndByMarkGroup)
 
 
 
