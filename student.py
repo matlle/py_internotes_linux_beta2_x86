@@ -590,7 +590,8 @@ class Student(QTreeView):
                 if mark_data[m]['mark_level'] <= 1:
                     QMessageBox.critical(self, u"Error - InterNotes", u"Veuillez renseigner " + 
                                                 u"le total de point pour chaque note")
-                    return
+                    return False
+
                 if 'mark_id' in mark_data[m]:
                     self.updateOldMark(mark_data[m]['mark_id'], mark_data[m]['mark_mark'], 
                                mark_data[m]['mark_level'], mark_data[m]['mark_observation'], 
@@ -616,6 +617,8 @@ class Student(QTreeView):
                         item_observation = mark_data[m]['item_observation']
                         item_observation.setData(Qt.AccessibleTextRole, 
                                    QVariant(mid))
+                    
+                    return True
 
 
 
@@ -629,11 +632,18 @@ class Student(QTreeView):
                 l_to = away_data[a]['away_time_to'].split(":") 
                 h_to = l_to[0].toInt()[0]
 
+
+                if h_from == 0 and h_to == 0:
+                    QMessageBox.critical(self, u"Error - InterNotes",
+                                         u"Pour chaque absence, " + 
+                                         u"vous devez indiquer l'heure de départ et l'heure d'arrivée")
+                    return False
+
                 if h_from > h_to:
                     QMessageBox.critical(self, u"Error - InterNotes",
                                          u"Pour chaque absence, " + 
                                          u"l'heure de départ doit être inférieur à l'heure d'arrivée")
-                    return
+                    return False
 
 
                 if 'away_id' in away_data[a]:
@@ -654,6 +664,7 @@ class Student(QTreeView):
                         item_motif.setData(Qt.AccessibleTextRole, 
                                    QVariant(aid))
 
+                    return True
 
 
 
@@ -663,7 +674,10 @@ class Student(QTreeView):
         data = self.getAllNewMarksFromTableView()     
         if not data:
             return
-        self.saveMarks(data, self.stid, data[0]['classroom_id'], data[0]['academic_year_id'], True)
+        if not self.saveMarks(data, self.stid, data[0]['classroom_id'],
+                data[0]['academic_year_id'], True):
+            return
+
         if self.btn_save:
             self.btn_save.setEnabled(False)
         self.deleteRemovablesMarks()
@@ -674,7 +688,8 @@ class Student(QTreeView):
         data = self.getAllNewAwaysFromTableView() 
         if not data:
             return
-        self.saveAways(data, self.stid, True)
+        if not self.saveAways(data, self.stid, True):
+            return
         if self.btn_save_away:
             self.btn_save_away.setEnabled(False)
         self.deleteRemovablesAways()
