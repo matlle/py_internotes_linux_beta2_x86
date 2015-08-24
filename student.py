@@ -590,7 +590,7 @@ class Student(QTreeView):
                 if mark_data[m]['mark_level'] <= 1:
                     QMessageBox.critical(self, u"Error - InterNotes", u"Veuillez renseigner " + 
                                                 u"le total de point pour chaque note")
-                    return False
+                    return
 
                 if 'mark_id' in mark_data[m]:
                     self.updateOldMark(mark_data[m]['mark_id'], mark_data[m]['mark_mark'], 
@@ -617,14 +617,12 @@ class Student(QTreeView):
                         item_observation = mark_data[m]['item_observation']
                         item_observation.setData(Qt.AccessibleTextRole, 
                                    QVariant(mid))
-                    
-                    return True
-
 
 
 
     def saveAways(self, away_data, stid, flag=False):
         if len(away_data) > 0:
+            print len(away_data)
             for a in range(0, len(away_data)):
                 l_from = away_data[a]['away_time_from'].split(":") 
                 h_from = l_from[0].toInt()[0]
@@ -637,13 +635,13 @@ class Student(QTreeView):
                     QMessageBox.critical(self, u"Error - InterNotes",
                                          u"Pour chaque absence, " + 
                                          u"vous devez indiquer l'heure de départ et l'heure d'arrivée")
-                    return False
+                    return
 
                 if h_from > h_to:
                     QMessageBox.critical(self, u"Error - InterNotes",
                                          u"Pour chaque absence, " + 
                                          u"l'heure de départ doit être inférieur à l'heure d'arrivée")
-                    return False
+                    return
 
 
                 if 'away_id' in away_data[a]:
@@ -664,20 +662,15 @@ class Student(QTreeView):
                         item_motif.setData(Qt.AccessibleTextRole, 
                                    QVariant(aid))
 
-                    return True
-
 
 
 
 
     def onClickedSaveBtn(self):
         data = self.getAllNewMarksFromTableView()     
-        if not data:
-            return
-        if not self.saveMarks(data, self.stid, data[0]['classroom_id'],
-                data[0]['academic_year_id'], True):
-            return
-
+        if data:
+            self.saveMarks(data, self.stid, data[0]['classroom_id'],
+                data[0]['academic_year_id'], True)
         if self.btn_save:
             self.btn_save.setEnabled(False)
         self.deleteRemovablesMarks()
@@ -686,10 +679,8 @@ class Student(QTreeView):
 
     def onClickedSaveAwayBtn(self):
         data = self.getAllNewAwaysFromTableView() 
-        if not data:
-            return
-        if not self.saveAways(data, self.stid, True):
-            return
+        if data:
+            self.saveAways(data, self.stid, True)
         if self.btn_save_away:
             self.btn_save_away.setEnabled(False)
         self.deleteRemovablesAways()
@@ -919,12 +910,14 @@ class Student(QTreeView):
     def setTableAwayByStudentIdAndByMarkGroup(self, group_index):
         if self.combo_classroom.currentIndex() == -1 or self.stid == None:
             return
+        """
         else: 
             ay_index = self.combo_ay.currentIndex()
             cr_index = self.combo_classroom.currentIndex()
             crid = self.combo_classroom.itemData(cr_index).toInt()[0]
             if self.isStudentHasMarksInThisClassroomId(crid) == False:
                 return
+        """
 
         mark_group = self.combo_mark_group_away.currentText()
 
@@ -1018,10 +1011,10 @@ class Student(QTreeView):
 
 
                     self.connect(items[i]['away_date'], SIGNAL("dateChanged(QDate)"), 
-                                     self.activeSaveBtn)
+                                     self.activeSaveAwayBtn)
 
                     self.connect(combo_justify, SIGNAL("currentIndexChanged(int)"), 
-                                     self.activeSaveBtn)
+                                     self.activeSaveAwayBtn)
 
 
 
