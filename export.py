@@ -66,7 +66,7 @@ class Export(QDialog):
             reply = dialog_photo_preview.exec_()
 
             self.new_header_image_file_name = QString(
-                    QDir.currentPath() + u"/images/upload/header/" + \
+                    QDir.currentPath() + u"/mpl-data/images/upload/header/" + \
                     uuid.uuid1().hex + ".png")
 
             if reply == 1:
@@ -2071,7 +2071,8 @@ class Export(QDialog):
                 font = QFont("Helvetica", 6, -1, False)
                 self.painter.setFont(font)
 
-                nb_away_verified = student.Student.getVerifiedAways(current_std_id)
+                nb_away_verified = student.Student.getVerifiedAways(current_std_id,
+                        group_period)
 
                 self.painter.drawText(
                     QRectF(x + 1708, y + 30, rect_little_six, fm_height - 10), 
@@ -2097,7 +2098,8 @@ class Export(QDialog):
                 self.painter.drawRect(rect_away_unverified)
 
 
-                nb_away_unverified = student.Student.getUnVerifiedAways(current_std_id)
+                nb_away_unverified = student.Student.getUnVerifiedAways(current_std_id,
+                        group_period)
 
                 font = QFont("Helvetica", 6, -1, False)
                 self.painter.setFont(font)

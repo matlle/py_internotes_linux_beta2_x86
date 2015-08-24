@@ -2339,7 +2339,7 @@ class Student(QTreeView):
             reply = dialog_photo_preview.exec_()
 
             self.new_photo_file_name = QString(
-                    QDir.currentPath() + u"/images/upload/userphoto/" + \
+                    QDir.currentPath() + u"/mpl-data/images/upload/userphoto/" + \
                             uuid.uuid1().hex + ".png")
 
             if reply == 1:
@@ -3279,13 +3279,14 @@ class Student(QTreeView):
 
 
     @staticmethod
-    def getVerifiedAways(stid):
+    def getVerifiedAways(stid, period):
         nb = 0
         query = QSqlQuery("SELECT ABS(ROUND(time_to_sec(TIMEDIFF( \
                                 away_time_to, away_time_from)) / 3600)) dt \
                            FROM away \
                            WHERE away_justify = 'Justifiée'" + \
-                           " AND student_id = " + str(stid))
+                           " AND student_id = " + str(stid) + \
+                           " AND away_period = '" + period + "'")
         if query.exec_():
             record = query.record()
             if not record.isEmpty():
@@ -3299,13 +3300,14 @@ class Student(QTreeView):
 
 
     @staticmethod
-    def getUnVerifiedAways(stid):
+    def getUnVerifiedAways(stid, period):
         nb = 0
         query = QSqlQuery("SELECT ABS(ROUND(time_to_sec(TIMEDIFF( \
                                 away_time_to, away_time_from)) / 3600)) dt \
                            FROM away \
                            WHERE away_justify = 'Non Justifiée'" + \
-                           " AND student_id = " + str(stid))
+                           " AND student_id = " + str(stid) + \
+                           " AND away_period = '" + period + "'")
         if query.exec_():
             record = query.record()
             if not record.isEmpty():
