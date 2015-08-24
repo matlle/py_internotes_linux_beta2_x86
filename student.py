@@ -6,7 +6,7 @@ from PyQt4.QtSql import *
 
 import tools, photopreview, academicyear, classe, infos, topic
 
-import uuid
+import uuid, datetime
 
 class Student(QTreeView):
     def __init__(self, in_stat_page, parent=None):
@@ -562,7 +562,7 @@ class Student(QTreeView):
 
 
     def deleteRemovablesAways(self):
-        list_id = self.list_removables_marks
+        list_id = self.list_removables_aways
         s = ''
         if list_id:
             if len(list_id) == 1:
@@ -1986,7 +1986,7 @@ class Student(QTreeView):
         self.table_view = QTableWidget()
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_view.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setAlternatingRowColors(True)
+        self.table_view.setAlternatingRowColors(True)
 
         self.table_view.setShowGrid(False)
         self.table_view.setTabKeyNavigation(True)
@@ -2481,6 +2481,7 @@ class Student(QTreeView):
         #student_infos['student_last_name'] = student_infos['student_last_name'].replace(" ", "")
         if reply[0] == 1:
             self.deleteRemovablesMarks()
+            self.deleteRemovablesAways()
             self.editStudentItem(student_infos)
             if self.infos is not None:
                 self.infos.showStudentInfos(index, updated=True)
@@ -3260,3 +3261,45 @@ class Student(QTreeView):
 
         
         return student_name
+
+
+
+
+    @staticmethod
+    def getVerifiedAways(stid):
+        nb = 0
+        query = QSqlQuery("SELECT HOUR(TIMEDIFF( \
+                                away_time_to, away_time_from)) dt \
+                           FROM away \
+                           WHERE away_justify = 'Justifiée'" + \
+                           " AND student_id = " + str(stid))
+        if query.exec_():
+            record = query.record()
+            if not record.isEmpty():
+                while(query.next()):
+                    dt = query.value(
+                        record.indexOf("dt")).toInt()[0]
+
+                    nb += dt
+
+        return nb
+
+
+    @staticmethod
+    def getUnVerifiedAways(stid):
+        nb = 0
+        query = QSqlQuery("SELECT HOUR(TIMEDIFF( \
+                                away_time_to, away_time_from)) dt \
+                           FROM away \
+                           WHERE away_justify = 'Non Justifiée'" + \
+                           " AND student_id = " + str(stid))
+        if query.exec_():
+            record = query.record()
+            if not record.isEmpty():
+                while(query.next()):
+                    dt = query.value(
+                        record.indexOf("dt")).toInt()[0]
+
+                    nb += dt
+
+        return nb
