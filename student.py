@@ -1932,9 +1932,9 @@ class Student(QTreeView):
         self.student_statut.addItem(u"Affecté(e)")
 
         if infos['student_statut'] == u'Non affecté(e)':
-            self.student_genre.setCurrentIndex(0)
+            self.student_statut.setCurrentIndex(0)
         elif infos['student_statut'] == u'Affecté(e)':
-            self.student_genre.setCurrentIndex(1)
+            self.student_statut.setCurrentIndex(1)
 
 
         self.student_height = QSpinBox()

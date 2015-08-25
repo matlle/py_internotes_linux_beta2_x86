@@ -37,7 +37,7 @@ class About(QDialog):
            u"<strong>Version 1.0.2 (Windows x86)</strong><br></br><br/><br/><br/>"
            u"Copyright © 2015 Matlle e.i. Tous droits reservés.<br/><br/><br/><br/><br/><br/><br/><br/>"
            u"<span style="">(+225) 07 08 68 98 / 41 87 07 68 / 01 58 03 30</span><br/>"
-           u"info@matlle.com<br/>"
+           u"matllesoftware@gmail.com<br/>"
            u"www.matlle.com"))
 
         label_about.setAlignment(Qt.AlignLeft)

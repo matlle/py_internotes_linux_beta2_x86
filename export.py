@@ -1987,7 +1987,7 @@ class Export(QDialog):
 
             
                 # price
-                w_price = width_title_avg + width_title_coef + width_title_avgcoef
+                w_price = width_title_avg + width_title_coef + width_title_avgcoef + 50
 
                 option = QTextOption(Qt.AlignLeft)
 
@@ -2001,7 +2001,7 @@ class Export(QDialog):
                     , option)
 
                 rect_little = w_price - (width_title_avgcoef + width_title_avg)
-                rect_little -= 160
+                rect_little -= 170
                 rect_th_cong = QRect(x + 1700, y + 10, rect_little, fm_height - 25)
                 self.painter.drawRect(rect_th_cong)
 
@@ -2013,7 +2013,7 @@ class Export(QDialog):
                     , option)
 
                 rect_little_two = w_price - (width_title_avgcoef + width_title_avg)
-                rect_little_two -= 160
+                rect_little_two -= 170
                 rect_th_encou = QRect(x + 1700, y + 10, rect_little_two, fm_height - 25)
                 self.painter.drawRect(rect_th_encou)
 
@@ -2025,7 +2025,7 @@ class Export(QDialog):
                       , option)
 
                 rect_little_three = w_price - (width_title_avgcoef + width_title_avg)
-                rect_little_three -= 160
+                rect_little_three -= 170
                 rect_th = QRect(x + 1700, y + 10, rect_little_three, fm_height - 25)
                 self.painter.drawRect(rect_th)
 
@@ -2038,7 +2038,7 @@ class Export(QDialog):
                         , option)
 
                 rect_little_four = w_price - (width_title_avgcoef + width_title_avg)
-                rect_little_four -= 160
+                rect_little_four -= 170
                 rect_warning = QRect(x + 1700, y + 10, rect_little_four, fm_height - 25)
                 self.painter.drawRect(rect_warning)
 
@@ -2051,7 +2051,7 @@ class Export(QDialog):
                     , option)
 
                 rect_little_five = w_price - (width_title_avgcoef + width_title_avg)
-                rect_little_five -= 160
+                rect_little_five -= 170
                 rect_blame = QRect(x + 1700, y + 10, rect_little_five, fm_height - 25)
                 self.painter.drawRect(rect_blame)
 
@@ -2063,7 +2063,7 @@ class Export(QDialog):
                     , option)
 
                 rect_little_six = w_price - (width_title_avgcoef + width_title_avg)
-                rect_little_six -= 160
+                rect_little_six -= 170
                 rect_away_verified = QRect(x + 1700, y + 10, rect_little_six, fm_height - 25)
                 self.painter.drawRect(rect_away_verified)
 
@@ -2093,7 +2093,7 @@ class Export(QDialog):
                     , option)
 
                 rect_little_seven = w_price - (width_title_avgcoef + width_title_avg)
-                rect_little_seven -= 160
+                rect_little_seven -= 170
                 rect_away_unverified = QRect(x + 1700, y + 10, rect_little_seven, fm_height - 25)
                 self.painter.drawRect(rect_away_unverified)
 
