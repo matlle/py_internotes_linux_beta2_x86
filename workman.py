@@ -42,7 +42,7 @@ class Workman(QObject):
 
             code_number = auth.Auth.generateCodeNumber()
             msg = mailer.t_account_restore_password(
-                    auth.Auth.getAccountCompanyName(), code_number)
+                    auth.Auth.getAccountUsername(), code_number)
 
 
             if self.send_email(auth.Auth.getAccountEmail(), "InterNotes - Changer votre mot de passe", 
@@ -77,7 +77,7 @@ class Workman(QObject):
 
         try:
             #server = smtplib.SMTP(SERVER) 
-            server = smtplib.SMTP("smtp.matlle.com", 587)
+            server = smtplib.SMTP("smtp.gmail.com", 587)
             server.ehlo()
             server.starttls()
             server.login(gmail_user, gmail_pwd)

@@ -980,7 +980,7 @@ class Export(QDialog):
                 self.painter.setPen(Qt.black)
                 self.painter.drawText(
                       QRectF(p_r_x + 50, p_r_y + 20, w_p_r - 6, fm_height - 6), 
-                      u"MATRICULE MINISTERIEL:", option)
+                      u"MATRICULE MINISTÈRE:", option)
 
                 p_r_x += rect_pro_matricule.width()
 

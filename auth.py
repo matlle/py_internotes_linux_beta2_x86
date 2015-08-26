@@ -203,7 +203,30 @@ class Auth(QDialog):
         account_company_name = unicode(account_company_name)
         account_company_name = account_company_name.encode('utf-8')
         return account_company_name
-    
+
+
+
+    @staticmethod
+    def getAccountUsername():
+        account_username = ''
+
+        sql = "SELECT account_username \
+               FROM account"
+        
+        query = QSqlQuery(sql)
+
+        if not query.exec_():
+            print "SQL Error!"
+        else:
+            record = query.record()
+            if not record.isEmpty():
+                while (query.next()):
+                    account_username = query.value(
+                            record.indexOf("account_username")).toString()
+
+        account_username = unicode(account_username)
+        account_username = account_username.encode('utf-8')
+        return account_username
 
 
 

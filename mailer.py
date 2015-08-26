@@ -29,7 +29,7 @@ def send_email(to, subject, msg):
     if f:
         try:
             #server = smtplib.SMTP(SERVER) 
-            server = smtplib.SMTP("smtp.google.com", 587)
+            server = smtplib.SMTP("smtp.gmail.com", 587)
             server.ehlo()
             server.starttls()
             server.login(gmail_user, gmail_pwd)
@@ -52,8 +52,8 @@ def t_account_created(company, username):
          
     return msg
 
-def t_account_restore_password(company, code):
-    msg = "Bonjour Mr/Mme responsable " + company + ",\n\n\n"\
+def t_account_restore_password(username, code):
+    msg = "Bonjour Mr/Mme " + username + ",\n\n\n"\
           "Une personne a récemment demandé à réinitialiser "\
           "votre mot de passe InterNotes.\n\nSi vous êtes à "\
           "l\'origine de cette action, vous pouvez saisir le "\
