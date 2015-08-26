@@ -53,7 +53,7 @@ def t_account_created(company, username):
     return msg
 
 def t_account_restore_password(username, code):
-    msg = "Bonjour Mr/Mme " + username + ",\n\n\n"\
+    msg = "Bonjour Mr/Mme " + username.title() + ",\n\n\n"\
           "Une personne a récemment demandé à réinitialiser "\
           "votre mot de passe InterNotes.\n\nSi vous êtes à "\
           "l\'origine de cette action, vous pouvez saisir le "\
