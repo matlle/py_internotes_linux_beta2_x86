@@ -167,12 +167,34 @@ class AcademicYear(QTreeWidget):
                 query_pre.finish()
 
 
+
+                query_away = QSqlQuery()
+                query_away.prepare("DELETE aw.* \
+                                      FROM student std \
+                                      LEFT JOIN away aw ON aw.student_id = std.student_id \
+                                      WHERE std.academic_year_id = :ayid \
+                                    ")
+
+                query_away.bindValue(":ayid", ayid)
+                if not query_away.exec_():
+                    QMessageBox.critical(self, "Error - InterNotes",
+                            u"Database Error: %s" % query_away.lastError().text())
+                    return
+
+                query_away.finish()
+
+
+
+
                 query_first = QSqlQuery()
-                query_first.prepare("DELETE m.*, std.*,\
+                query_first.prepare("DELETE m.*,\
+                                            t.*,\
+                                            std.*,\
                                             cr.* \
                                      FROM classroom  cr \
-                                     LEFT JOIN student std ON std.classroom_id = cr.classroom_id \
                                      LEFT JOIN mark m ON m.classroom_id = cr.classroom_id \
+                                     LEFT JOIN topic t ON t.classroom_id = cr.classroom_id \
+                                     LEFT JOIN student std ON std.classroom_id = cr.classroom_id \
                                      INNER JOIN class cl ON cl.class_id = cr.class_id \
                                      WHERE cl.academic_year_id = :ayid \
                                    ")
@@ -184,6 +206,7 @@ class AcademicYear(QTreeWidget):
                     return
 
                 query_first.finish()
+
 
 
 
@@ -205,6 +228,24 @@ class AcademicYear(QTreeWidget):
                     self.setHeaderLabel(QString(u"Années academique (%i)" % self.topLevelItemCount()))
                     self.class_tree.setHeaderLabel(u"Classes (0)")
                     self.class_tree.clear()
+
+
+                    self.class_tree.student_tree.infos.showStudentInfos(0)
+
+                    del self.class_tree.student_tree.model
+                    self.class_tree.student_tree.model = QStandardItemModel(self.class_tree.student_tree)
+                    self.class_tree.student_tree.model.setHorizontalHeaderLabels(QStringList(
+                        u"Elèves - Nom et prenoms (0)"
+                        ))
+            
+                    self.class_tree.student_tree.proxy_model.setSourceModel(
+                            self.class_tree.student_tree.model)
+
+                    self.class_tree.student_tree.infos.showStudentInfos(0)
+
+
+
+
                     next_item = self.currentItem()
                     self.class_tree.selectClassesByAcademicYearId(next_item, 0)
 

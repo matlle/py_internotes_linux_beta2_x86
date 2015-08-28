@@ -2413,9 +2413,10 @@ class Student(QTreeView):
             self.removeOldPhoto(student_id)
 
             query = QSqlQuery()
-            query.prepare("DELETE m.*, std.* \
+            query.prepare("DELETE m.*, aw.*, std.* \
                            FROM student std \
                            LEFT JOIN mark m ON m.student_id = std.student_id \
+                           LEFT JOIN away aw ON aw.student_id = std.student_id \
                            WHERE std.student_id = :stdid")
             query.bindValue(":stdid", student_id)
             if not query.exec_():

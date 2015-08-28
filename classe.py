@@ -380,9 +380,46 @@ class Class(QTreeWidget):
                 query_pre.finish()
 
 
+
+
+                query_away = QSqlQuery()
+                query_away.prepare("DELETE aw.* \
+                                      FROM student std \
+                                      LEFT JOIN away aw ON aw.student_id = std.student_id \
+                                      WHERE std.class_id = :clid \
+                                    ")
+
+                query_away.bindValue(":clid", class_id)
+                if not query_away.exec_():
+                    QMessageBox.critical(self, "Error - InterNotes",
+                            u"Database Error: %s" % query_away.lastError().text())
+                    return
+
+                query_away.finish()
+
+
+
+                query_topic = QSqlQuery()
+                query_topic.prepare("DELETE t.* \
+                                      FROM classroom cr \
+                                      LEFT JOIN topic t ON t.classroom_id = cr.classroom_id \
+                                      WHERE cr.class_id = :clid \
+                                    ")
+
+                query_topic.bindValue(":clid", class_id)
+                if not query_topic.exec_():
+                    QMessageBox.critical(self, "Error - InterNotes",
+                            u"Database Error: %s" % query_topic.lastError().text())
+                    return
+
+                query_topic.finish()
+
+
+
                 query = QSqlQuery()
-                query.prepare("DELETE m.*, cr.*, \
+                query.prepare("DELETE m.*, \
                                       std.*, \
+                                      cr.*, \
                                       cl.* \
                                FROM class cl \
                                LEFT JOIN student std ON std.class_id = cl.class_id \
@@ -436,11 +473,33 @@ class Class(QTreeWidget):
                 query_pre.finish()
 
 
+
+                query_away = QSqlQuery()
+                query_away.prepare("DELETE aw.* \
+                                      FROM student std \
+                                      LEFT JOIN away aw ON aw.student_id = std.student_id \
+                                      WHERE std.classroom_id = :crid \
+                                    ")
+
+                query_away.bindValue(":crid", classroom_id)
+                if not query_away.exec_():
+                    QMessageBox.critical(self, "Error - InterNotes",
+                            u"Database Error: %s" % query_away.lastError().text())
+                    return
+
+                query_away.finish()
+
+
+
+
                 query = QSqlQuery()
-                query.prepare("DELETE m.*, std.*, \
+                query.prepare("DELETE m.*, \
+                                      std.*, \
+                                      t.*, \
                                       cr.* \
                                FROM classroom cr \
                                LEFT JOIN student std ON std.classroom_id = cr.classroom_id \
+                               LEFT JOIN topic t ON t.classroom_id = cr.classroom_id \
                                LEFT JOIN mark m ON m.classroom_id = cr.classroom_id \
                                WHERE cr.classroom_id = :id")
                 query.bindValue(":id", classroom_id)
