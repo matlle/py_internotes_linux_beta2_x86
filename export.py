@@ -1987,7 +1987,7 @@ class Export(QDialog):
 
             
                 # price
-                w_price = width_title_avg + width_title_coef + width_title_avgcoef + 50
+                w_price = width_title_avg + width_title_coef + width_title_avgcoef
 
                 option = QTextOption(Qt.AlignLeft)
 
