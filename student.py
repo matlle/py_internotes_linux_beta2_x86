@@ -265,7 +265,8 @@ class Student(QTreeView):
         #spin_mark.setMinimum(1)
 
         spin_on = QSpinBox()
-        spin_on.setMinimum(1)
+        spin_on.setMinimum(10)
+        spin_on.setSingleStep(10)
 
         combo_topic = QComboBox()
         if self.combo_classroom.currentIndex() != -1:
@@ -587,10 +588,12 @@ class Student(QTreeView):
     def saveMarks(self, mark_data, stid, crid, ayid, flag=False):
         if len(mark_data) > 0:
             for m in range(0, len(mark_data)):
+                """
                 if mark_data[m]['mark_level'] <= 1:
                     QMessageBox.critical(self, u"Error - InterNotes", u"Veuillez renseigner " + 
                                                 u"le total de point pour chaque note")
                     return
+                """
 
                 if 'mark_id' in mark_data[m]:
                     self.updateOldMark(mark_data[m]['mark_id'], mark_data[m]['mark_mark'], 
@@ -875,7 +878,9 @@ class Student(QTreeView):
                     self.table_view.setCellWidget(i, 1, spin_mark)
 
                     spin_level = QSpinBox()
-                    spin_level.setMinimum(1)
+                    spin_level.setMinimum(10)
+                    spin_level.setSingleStep(10)
+
                     spin_level.setValue(items[i]['mark_level'])
                     self.table_view.setCellWidget(i, 2, spin_level)
                     

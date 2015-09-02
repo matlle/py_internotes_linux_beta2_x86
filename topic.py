@@ -712,7 +712,7 @@ class Topic(QDialog):
     @staticmethod
     def getAllTopicTypes():
         data = []
-        query = QSqlQuery("SELECT topic_type \
+        query = QSqlQuery("SELECT DISTINCT topic_type \
                            FROM topic \
                           ")
         if not query.exec_():
