@@ -391,6 +391,12 @@ class Topic(QDialog):
                     self.table_view.setItem(i, 2, items[i]['item_prof'])
 
                     combo_type_topic = QComboBox()
+                    combo_type_topic.setDuplicatesEnabled(False)
+                    combo_type_topic.setEditable(True)
+                    combo_type_topic.setInsertPolicy(QComboBox.InsertAtTop)
+
+
+                    combo_type_topic.addItem(items[i]['item_type'])
                     combo_type_topic.addItem(u'Autre')
                     combo_type_topic.addItem(u'Littéraire')
                     combo_type_topic.addItem(u'Scientifique')
