@@ -15,7 +15,7 @@ class Guard(QDialog):
         super(Guard, self).__init__(parent)
 
         self.trial_days = 15
-        self.k_prod = u"HVWP8Z4BTE1N9NDOJB7H87R7T"
+        self.k_prod = u"2NLYQY4LVO2Q60MP0C0OZ6VGU"
         self.activated_prod = False
         
         self.init()
