@@ -161,10 +161,21 @@ class Topic(QDialog):
         spin_coef.setMinimum(1)
 
         combo_type = QComboBox()
+
+
+        to_types = self.getAllTopicTypes()
+                    
+        for tt in range(0, len(to_types)):
+            combo_type.addItem(to_types[tt])
+
         combo_type.addItem(u'Autre')
         combo_type.addItem(u'Littéraire')
         combo_type.addItem(u'Scientifique')
         combo_type.addItem(u'Technique')
+
+        combo_type.setDuplicatesEnabled(False)
+        combo_type.setEditable(True)
+        combo_type.setInsertPolicy(QComboBox.InsertAtTop)
 
 
         self.table_view.setItem(nb_row, 0, QTableWidgetItem())
@@ -391,16 +402,22 @@ class Topic(QDialog):
                     self.table_view.setItem(i, 2, items[i]['item_prof'])
 
                     combo_type_topic = QComboBox()
-                    combo_type_topic.setDuplicatesEnabled(False)
-                    combo_type_topic.setEditable(True)
-                    combo_type_topic.setInsertPolicy(QComboBox.InsertAtTop)
 
 
-                    combo_type_topic.addItem(items[i]['item_type'])
+                    to_types = self.getAllTopicTypes()
+                    
+                    for tt in range(0, len(to_types)):
+                        combo_type_topic.addItem(to_types[tt])
+
                     combo_type_topic.addItem(u'Autre')
                     combo_type_topic.addItem(u'Littéraire')
                     combo_type_topic.addItem(u'Scientifique')
                     combo_type_topic.addItem(u'Technique')
+
+                    combo_type_topic.setDuplicatesEnabled(False)
+                    combo_type_topic.setEditable(True)
+                    combo_type_topic.setInsertPolicy(QComboBox.InsertAtBottom)
+
                     index_type = combo_type_topic.findText(items[i]['item_type'])
                     combo_type_topic.setCurrentIndex(index_type)
                     self.table_view.setCellWidget(i, 3, combo_type_topic)
@@ -688,3 +705,25 @@ class Topic(QDialog):
             print "Database Error: %s" % db.lastError().text()
 
         return marks
+
+
+
+
+    @staticmethod
+    def getAllTopicTypes():
+        data = []
+        query = QSqlQuery("SELECT topic_type \
+                           FROM topic \
+                          ")
+        if not query.exec_():
+            print "SQL Error!"
+        if query.exec_():
+            record = query.record()
+            if not record.isEmpty():
+                while(query.next()):
+                    topic_type = query.value(
+                            record.indexOf("topic_type")).toString()
+
+                    data.append(topic_type)
+
+        return data
