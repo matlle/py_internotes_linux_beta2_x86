@@ -422,6 +422,12 @@ class Export(QDialog):
         else:
             self.btn_export.setEnabled(False)
     
+    def activeExportClassroomListBtn(self):
+        if self.combo_classroom.currentIndex() != -1:
+            self.btn_export_classroom_list.setEnabled(True)
+        else:
+            self.btn_export_classroom_list.setEnabled(False)
+
     def hideYcrGroup(self, bol):
         self.group_ycr.setVisible(False)
         self.setPeriodComboBox()
@@ -601,7 +607,7 @@ class Export(QDialog):
 
         #if dialog.exec_():
 
-        advice_pdf_name = u'/bulletin-' # advice... how say 'proposer' in English?
+        advice_pdf_name = u'/bulletin-' # recommand... how say 'proposer' in English?
 
         if 1:
             topics = []
@@ -2348,11 +2354,14 @@ class Export(QDialog):
         #self.btn_header = QPushButton(u"Modifier l'entête")
         
 
-        self.btn_export = QPushButton(u"Exporter PDF")
+        self.btn_export = QPushButton(u"Exporter Bulletin PDF")
+        self.btn_export_classroom_list = QPushButton(u"Exporter Liste de classe PDF")
+        self.btn_export_classroom_list.setEnabled(False)
         self.btn_export.setEnabled(False)
         self.btn_exit = QPushButton(u"Quitter")
         self.btn_exit.setIcon(QIcon(":/images/editdelete.png"))
         self.btn_export.setIcon(QIcon(":/images/exportpdf.png"))
+        self.btn_export_classroom_list.setIcon(QIcon(":/images/exportpdf.png"))
         self.btn_header.setIcon(QIcon(":/images/printheader.jpg"))
 
 
@@ -2410,6 +2419,7 @@ class Export(QDialog):
         btn_box.addButton(self.btn_check_header, QDialogButtonBox.ActionRole)
         btn_box.addButton(self.btn_header, QDialogButtonBox.YesRole)
         btn_box.addButton(self.btn_export, QDialogButtonBox.YesRole)
+        btn_box.addButton(self.btn_export_classroom_list, QDialogButtonBox.YesRole)
         btn_box.addButton(self.btn_exit, QDialogButtonBox.RejectRole)
 
 
@@ -2441,7 +2451,12 @@ class Export(QDialog):
         self.connect(self.btn_radio_selected_student, SIGNAL("clicked(bool)"), self.hideYcrGroup)
         self.connect(self.btn_radio_all_students, SIGNAL("clicked(bool)"), self.showYcrGroup)
         self.connect(self.btn_header, SIGNAL("clicked(bool)"), self.setHeader)
+
         self.connect(self.btn_export, SIGNAL("clicked()"), self.exportPDF)
+
+        self.connect(self.btn_export_classroom_list,
+                SIGNAL("clicked()"), self.exportClassroomListPDF)
+
         self.connect(self.btn_exit, SIGNAL("clicked()"), self.reject)
 
         self.connect(self.btn_check_header, SIGNAL("stateChanged(int)"), 
@@ -2460,6 +2475,12 @@ class Export(QDialog):
         self.connect(self.combo_classroom, SIGNAL("currentIndexChanged(int)"), 
                 self.activeExportBtn)
 
+        self.connect(self.combo_classroom, SIGNAL("currentIndexChanged(int)"), 
+                self.activeExportClassroomListBtn)
+
+
+        self.connect(self.combo_classroom, SIGNAL("activated(int)"), 
+                self.activeExportClassroomListBtn)
 
         self.connect(self.combo_classroom, SIGNAL("activated(int)"), 
                 self.activeExportBtn)
