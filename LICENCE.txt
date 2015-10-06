@@ -1,4 +1,4 @@
-GPL LICENCE
+GNU GPL LICENCE
 
 Copyright InterNotes
 
