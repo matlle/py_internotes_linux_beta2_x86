@@ -66,7 +66,7 @@ class Export(QDialog):
             reply = dialog_photo_preview.exec_()
 
             self.new_header_image_file_name = QString(
-                    QDir.currentPath() + u"/mpl-data/images/upload/header/" + \
+                    QDir.currentPath() + u"images/upload/header/" + \
                     uuid.uuid1().hex + ".png")
 
             if reply == 1:
@@ -2334,6 +2334,1766 @@ class Export(QDialog):
     
 
 
+
+
+    def exportClassroomListPDF(self):
+        self.printer = QPrinter(QPrinter.HighResolution)
+        self.printer.setPaperSize(QPrinter.A4)
+        self.printer.setOrientation(QPrinter.Portrait)
+
+        self.printer.setOutputFormat(QPrinter.PdfFormat)
+        
+        """
+        doc_name = QFileDialog.getSaveFileName(self, u"Exporter pdf", 
+                QDir.homePath() + u"/bulletin.pdf", 
+                                                          "PDF (*.pdf)")
+        if doc_name.isEmpty() or doc_name is None:
+            return
+        self.printer.setOutputFileName(doc_name)
+        """
+
+        #self.printer.setOutputFileName("bulletin.pdf")
+
+        #dialog = QPrintDialog(self.printer, self)
+        #dialog.setOption(QAbstractPrintDialog.PrintToFile)
+        #dialog.setWindowTitle(u"Exporter PDF - InterNotes")
+
+        #if dialog.exec_():
+
+        advice_pdf_name = u'/liste-' # recommand... how say 'proposer' in English?
+
+        if 1:
+            topics = []
+            group_period = ''
+            current_std_id = 0
+            current_std_cr_name = u''
+            stds_id = []
+            infos_std = {}
+            group_period = self.combo_period.currentText()
+
+            #advice_pdf_name += group_period + u"-"
+
+            if self.btn_radio_selected_student.isChecked():
+                std_id = self.getSelectedStudentId()
+                stds_id.append(std_id)
+
+                student_name = student.Student.getNameById(std_id)
+
+                advice_pdf_name += student_name
+                
+            else:
+                cr_index = self.combo_classroom.currentIndex()
+                current_std_crid = self.combo_classroom.itemData(cr_index).toInt()[0]
+                cr_list_stds_id = student.Student.getAllStudentsIdByClassroomId(
+                        current_std_crid)
+
+                advice_pdf_name += self.combo_classroom.currentText()
+
+
+                for i in range(0, len(cr_list_stds_id)):
+                    stdid = cr_list_stds_id[i]
+                    if student.Student.isStudentHasAnyMarksInThisMarkGroup(stdid, group_period):
+                        stds_id.append(stdid)
+
+            advice_pdf_name += u".pdf"
+
+            doc_name = QFileDialog.getSaveFileName(self, u"Exporter pdf", 
+                QDir.homePath() + advice_pdf_name, 
+                                                          "PDF (*.pdf)")
+            if doc_name.isEmpty() or doc_name is None:
+                return
+            self.printer.setOutputFileName(doc_name)
+
+
+
+
+
+            s = 0
+
+            self.printer.newPage()
+            self.painter = QPainter(self.printer)
+
+            while s < len(stds_id):
+                current_std_id = stds_id[s]
+                """
+                current_std_periods = self.getAcademicYearPeriodByStudentId(current_std_id)
+                if not group_period in current_std_periods:
+                    s += 1
+                    continue
+                """
+
+                current_std_crid = student.Student.getClassroomIdById(current_std_id)
+                current_std_cr_name = classe.Class.getClassroomNameById(current_std_crid)
+                topics = classe.Class.getAllTopicsByClassroomId(current_std_crid)
+                infos_std = self.student_tree.getStudentInfosById(current_std_id)
+
+                pageRect = self.printer.pageRect()
+
+                self.footer()
+
+                self.painter.save()
+
+
+                #self.painter.drawText(0, 0, "Text on initial minimum border")
+
+           
+                sans_font = QFont("Helvetica", 6)
+                sans_line_height = QFontMetrics(sans_font).height()
+
+                serif_font = QFont("Times", 11)
+                serif_font.setBold(False)
+                fm = QFontMetrics(serif_font)
+                fm_height = int(fm.height() * 8.5)
+
+                left_margin = 75
+                x = left_margin
+                include_header = False
+                if self.btn_check_header.isChecked():
+                    initial_y   = 0
+                    include_header = True
+                else:
+                    initial_y   = 1500
+
+                y = initial_y
+
+
+
+
+                option = QTextOption(Qt.AlignCenter)
+                width_title_topic = fm.width(u" MATIÈRE ") * 29.5
+                width_title_avg = fm.width(u" MOY. ") * 11.5
+                width_title_coef = fm.width(u"COEF") * 11.5
+                width_title_avgcoef = fm.width(u"MOY.XCOEF.") * 11.5
+                width_title_rank = fm.width(u" RANG ") * 16.5
+                width_title_prof = fm.width(u" PROFESSEUR ") * 13
+                width_title_remark = fm.width(u" APPRECIATION ") * 11.5
+                width_title_sign = fm.width(u" EMARGEMENT ") * 11.5
+
+
+                whole_width = width_title_topic + width_title_avg + width_title_coef + \
+                              width_title_avgcoef + width_title_rank + width_title_prof + \
+                              width_title_remark + width_title_sign
+
+                if include_header == True:
+                    #header_infos = auth.Auth.getAccountHeaderInfos()
+                    header_infos = self.getHeaderInfos()
+
+                    # header_logo
+                    w_logo = whole_width
+
+                    account_logo = header_infos["header_image"] #auth.Auth.getAccountLogo()
+
+                    if not account_logo.isEmpty() \
+                            and not account_logo == '' \
+                            and not account_logo == None:
+                        rect_logo = QRect(x, y, w_logo, fm_height + 650)
+
+                        self.painter.setPen(Qt.NoPen)
+
+                        self.painter.drawRect(rect_logo)
+
+                        self.painter.setPen(Qt.black)
+
+                        pic = QPixmap(account_logo)
+
+                        pic_scaled = pic.scaledToHeight(fm_height + 650)
+                        self.painter.drawPixmap(x, y, pic_scaled)
+
+                        y += rect_logo.height() 
+
+
+
+
+                    # header_company_name
+                    w_header_company_name = whole_width
+
+
+                    rect_header_company_name = QRect(x, y + 25, w_header_company_name, fm_height + 5) 
+                    self.painter.drawRect(rect_header_company_name)
+
+                    self.painter.drawText(
+                        QRectF(x, y + 30, w_header_company_name, fm_height), 
+                            QString("%1")
+                              .arg(auth.Auth.getAccountCompanyName()).toUpper()
+                              , option)
+
+                    y += rect_header_company_name.height() 
+
+
+                    # header postal address - phone number - minister 
+                    w_header_postal_phone = width_title_topic + width_title_avg + width_title_coef + \
+                                        width_title_avgcoef
+
+                    rect_header_postal_phone = QRect(x, y, w_header_postal_phone, fm_height + 200)
+
+                    self.painter.setPen(Qt.NoPen)
+
+                    self.painter.drawRect(rect_header_postal_phone)
+
+                    self.painter.setPen(Qt.black)
+
+                    font = QFont("Helvetica", 6, -1, False)
+                    self.painter.setFont(font)
+                
+               
+                    option = QTextOption(Qt.AlignLeft)
+                    self.painter.drawText(
+                         QRectF(x, y + 35, w_header_postal_phone, fm_height + 200), 
+                         QString("Localisation:"+ " " +"%1\nAdresse Postale:" + "  " +"%2\nTéléphone: %3")
+                              .arg(header_infos["account_school_localization"]).toUpper()
+                              .arg(header_infos["account_postal_address"]).toUpper()
+                              .arg(header_infos["account_phone1"] + " / " + \
+                                      header_infos["account_phone2"])
+                              , option)
+
+
+                    header_x = x
+
+                    header_x += rect_header_postal_phone.width()
+
+                    w_header_minister = width_title_rank + width_title_prof + width_title_remark + \
+                                        width_title_sign
+
+                    rect_header_minister = QRect(header_x, y, w_header_minister, fm_height + 200)
+
+                    self.painter.setPen(Qt.NoPen)
+
+                    self.painter.drawRect(rect_header_minister)
+
+                    self.painter.setPen(Qt.black)
+
+                    option = QTextOption(Qt.AlignCenter)
+                    self.painter.drawText(
+                         QRectF(header_x, y + 35, w_header_minister, fm_height + 80), 
+                         QString("RÉPUBLIQUE DE CÔTE D'IVOIRE\n%1")
+                              .arg(header_infos["header_minister"]).toUpper()
+                              , option)
+
+
+
+
+
+
+                    y += rect_header_postal_phone.height() + 100 
+
+
+
+
+                    font = QFont("Helvetica", 8, -1, False)
+                    self.painter.setFont(QFont())
+
+
+                    option = QTextOption(Qt.AlignCenter)
+
+                    # end header
+
+
+
+                self.painter.setPen(Qt.NoPen)
+
+                p_x = x
+                w_mg = width_title_topic + width_title_avg + width_title_coef
+
+                rect_mg = QRect(p_x, y, w_mg, fm_height + 100)
+                self.painter.drawRect(rect_mg)
+
+                self.painter.setPen(Qt.black)
+
+                self.painter.drawText(
+                         QRectF(p_x + 3, y + 50, w_mg - 6, fm_height - 6), 
+                            QString("Liste de classe: ")
+                              , option)
+
+                p_x += rect_mg.width()
+                w_cr = width_title_avgcoef + width_title_rank + width_title_prof
+
+                self.painter.setPen(Qt.NoPen)
+
+                rect_classroom = QRect(p_x, y, w_cr, fm_height + 100)
+                self.painter.drawRect(rect_classroom)
+
+                self.painter.setPen(Qt.black)
+
+                self.painter.drawText(
+                       QRectF(p_x + 3, y + 50, w_cr - 6, fm_height - 6), 
+                          QString("CLASSE: %1")
+                              .arg(current_std_cr_name).toUpper()
+                          , option)
+
+                self.painter.setPen(Qt.black)
+
+                p_x += rect_classroom.width() + width_title_remark
+           
+                """
+                w_photo = width_title_sign
+
+                rect_photo = QRect(p_x, y, w_photo, fm_height + 1300)
+                #self.painter.drawRect(rect_photo)
+
+                std_photo_name = infos_std['student_photo_name']
+                
+                
+                if std_photo_name.isEmpty() or \
+                        std_photo_name == '' or \
+                        std_photo_name == None or \
+                        QPixmap(std_photo_name).isNull():
+
+                    self.painter.drawRect(rect_photo)
+                    if Export.isAccountHasLogo() == True: 
+                        self.painter.drawText(
+                          QRectF(p_x + 3, (fm_height + 3200) / 1.6, w_photo - 6, fm_height - 6), 
+                            u"PHOTO", option)
+                    else:
+                        self.painter.drawText(
+                          QRectF(p_x + 3, (fm_height + 3200) / 2.6, w_photo - 6, fm_height - 6), 
+                            u"PHOTO", option)
+                else:
+                    self.painter.setPen(Qt.NoPen)
+                    self.painter.drawRect(rect_photo)
+                    self.painter.setPen(Qt.black)
+
+                    photo = QPixmap(std_photo_name)
+                    photo = photo.scaled(w_photo - 1, fm_height + 1300)
+                    self.painter.drawPixmap(p_x, y, photo)
+                """
+
+
+                """
+              
+                y += rect_classroom.height()
+
+
+                w_infos = width_title_topic + width_title_avg + width_title_coef + width_title_avgcoef
+                w_infos += width_title_rank + width_title_prof
+
+
+                rect_infos = QRect(x, y, w_infos, fm_height + 1030)
+                self.painter.drawRect(rect_infos)
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+
+                option = QTextOption(Qt.AlignLeft)
+
+
+                p_r_y = y
+                p_r_x = x
+                w_p_r = width_title_coef + width_title_avgcoef
+            
+                rect_pro_matricule = QRect(p_r_x + 20, p_r_y + 20, w_p_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_p_r - 6, fm_height - 6), 
+                        u"MATRICULE:", option)
+
+                p_r_x += rect_pro_matricule.width()
+
+
+                w_d_r = width_title_topic
+
+                rect_pro_matricule_one = QRect(p_r_x + 20, p_r_y + 20, w_d_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                       QRectF(p_r_x + 50, p_r_y + 20, w_d_r - 6, fm_height - 6), 
+                          QString("%1")
+                        .   arg(infos_std['student_matricule'])
+                    , option)
+
+                p_r_x += rect_pro_matricule_one.width()
+
+                w_dd_r = width_title_remark
+
+                rect_pro_ay = QRect(p_r_x + 20, p_r_y + 20, w_dd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                       QRectF(p_r_x + 50, p_r_y + 20, w_dd_r - 6, fm_height - 6), 
+                         u"ANNÉE ACADEMIQUE:", option)
+
+
+                p_r_x += rect_pro_ay.width()
+
+                w_ddd_r = width_title_prof - 23
+
+                ay_name = student.Student.getAcademicYearNameById(current_std_id)
+
+                rect_pro_ay_one = QRect(p_r_x + 20, p_r_y + 20, w_ddd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                      QRectF(p_r_x + 50, p_r_y + 20, w_ddd_r - 6, fm_height - 6), 
+                         QString("%1")
+                          .arg(ay_name)
+                    , option)
+
+
+
+                p_r_x = x
+                p_r_y += rect_pro_ay_one.height() + 70
+
+
+                rect_pro_matricule = QRect(p_r_x + 20, p_r_y + 20, w_p_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                      QRectF(p_r_x + 50, p_r_y + 20, w_p_r - 6, fm_height - 6), 
+                      u"MATRICULE MINISTÈRE:", option)
+
+                p_r_x += rect_pro_matricule.width()
+
+
+                w_d_r = width_title_topic
+
+                rect_pro_matricule_one = QRect(p_r_x + 20, p_r_y + 20, w_d_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                    QRectF(p_r_x + 50, p_r_y + 20, w_d_r - 6, fm_height - 6), 
+                    QString("%1")
+                        .arg(infos_std["student_matricule_ministeriel"])
+                    , option)
+
+                p_r_x += rect_pro_matricule_one.width()
+
+                w_dd_r = width_title_remark
+
+                rect_pro_ay = QRect(p_r_x + 20, p_r_y + 20, w_dd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                       QRectF(p_r_x + 50, p_r_y + 20, w_dd_r - 6, fm_height - 6), 
+                        u"STATUT:", option)
+
+
+                p_r_x += rect_pro_ay.width()
+
+                w_ddd_r = width_title_prof - 23
+
+                rect_pro_ay_one = QRect(p_r_x + 20, p_r_y + 20, w_ddd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                       QRectF(p_r_x + 50, p_r_y + 20, w_ddd_r - 6, fm_height - 6), 
+                         QString("%1")
+                        .   arg(infos_std["student_statut"].toUpper())
+                       , option)
+
+
+                p_r_x = x
+                p_r_y += rect_pro_ay_one.height() + 70
+
+
+                rect_pro_matricule = QRect(p_r_x + 20, p_r_y + 20, w_p_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_p_r - 6, fm_height - 6), 
+                           u"NOM ET PRENOMS:", option)
+
+                p_r_x += rect_pro_matricule.width()
+
+
+                w_d_r = width_title_topic
+
+                rect_pro_matricule_one = QRect(p_r_x + 20, p_r_y + 20, w_d_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_d_r - 6, fm_height - 6), 
+                          QString("%1")
+                           .arg(infos_std["student_last_name"] + " " + infos_std["student_first_name"])
+                           .toUpper()
+                        , option)
+
+                p_r_x += rect_pro_matricule_one.width()
+
+                w_dd_r = width_title_remark
+
+                rect_pro_ay = QRect(p_r_x + 20, p_r_y + 20, w_dd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_dd_r - 6, fm_height - 6), 
+                          u"EFFECTIF DE CLASSE:", option)
+
+
+                p_r_x += rect_pro_ay.width()
+
+                w_ddd_r = width_title_prof - 23
+
+                std_nb = classe.Class.getNumberOfStudentInThisClassroomById(
+                    current_std_crid)
+            
+                rect_pro_ay_one = QRect(p_r_x + 20, p_r_y + 20, w_ddd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_ddd_r - 6, fm_height - 6), 
+                           QString("%1")
+                        .arg(std_nb)
+                    , option)
+
+
+
+                p_r_x = x
+                p_r_y += rect_pro_ay_one.height() + 70
+
+
+                rect_pro_matricule = QRect(p_r_x + 20, p_r_y + 20, w_p_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_p_r - 6, fm_height - 6), 
+                          u"DATE DE NAISSANCE:", option)
+
+                p_r_x += rect_pro_matricule.width()
+
+
+                w_d_r = width_title_topic
+
+                rect_pro_matricule_one = QRect(p_r_x + 20, p_r_y + 20, w_d_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                       QRectF(p_r_x + 50, p_r_y + 20, w_d_r - 6, fm_height - 6), 
+                           QString("%1     GENRE:   %2")
+                              .arg(infos_std['student_birth_date'])
+                              .arg(infos_std['student_genre'])
+                       , option)
+
+                p_r_x += rect_pro_matricule_one.width()
+
+                w_dd_r = width_title_remark
+
+                rect_pro_ay = QRect(p_r_x + 20, p_r_y + 20, w_dd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_dd_r - 6, fm_height - 6), 
+                            u"REDOUBLANT(E):", option)
+
+
+                p_r_x += rect_pro_ay.width()
+
+                w_ddd_r = width_title_prof - 23
+
+                rect_pro_ay_one = QRect(p_r_x + 20, p_r_y + 20, w_ddd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_ddd_r - 6, fm_height - 6), 
+                            QString("%1")
+                                .arg(infos_std['student_redoubler'])
+                        , option)
+
+
+                p_r_x = x
+                p_r_y += rect_pro_ay_one.height() + 70
+
+
+                rect_pro_matricule = QRect(p_r_x + 20, p_r_y + 20, w_p_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_p_r - 6, fm_height - 6), 
+                            u"ÉCOLE PRÉCEDENTE:", option)
+
+                p_r_x += rect_pro_matricule.width()
+
+
+                w_d_r = width_title_topic
+
+                rect_pro_matricule_one = QRect(p_r_x + 20, p_r_y + 20, w_d_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_matricule_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_d_r - 6, fm_height - 6), 
+                            QString("%1")
+                                .arg(infos_std['student_previous_school'])
+                                .toUpper()
+                        , option)
+
+                p_r_x += rect_pro_matricule_one.width()
+
+                w_dd_r = width_title_remark + 200
+
+                rect_pro_ay = QRect(p_r_x + 20, p_r_y + 20, w_dd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_dd_r - 6, fm_height - 6), 
+                           u"CLASSE PRÉCEDENTE:", option)
+
+
+                p_r_x += rect_pro_ay.width()
+
+                w_ddd_r = width_title_prof - 23
+
+                rect_pro_ay_one = QRect(p_r_x + 20, p_r_y + 20, w_ddd_r, fm_height)
+                self.painter.setPen(Qt.NoPen)
+                self.painter.drawRect(rect_pro_ay_one)
+                self.painter.setPen(Qt.black)
+                self.painter.drawText(
+                        QRectF(p_r_x + 50, p_r_y + 20, w_ddd_r - 6, fm_height - 6), 
+                            QString("%1")
+                            .arg(infos_std["student_previous_classroom"].toUpper())
+                        , option)
+
+
+              """
+
+
+
+            #==============> TABLE HEAD <==================
+
+                option = QTextOption(Qt.AlignCenter)
+                font = QFont()
+                self.painter.setFont(font)
+                self.painter.setPen(Qt.black)
+
+                y += rect_classroom.height()
+
+                #y += rect_infos.height() + 100
+
+                rect_topic = QRect(x, y, width_title_topic, fm_height)
+                self.painter.fillRect(rect_topic, QColor("#cccccc"))
+                self.painter.drawRect(rect_topic)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, width_title_topic - 6, fm_height - 6), 
+                    u"Nom et Prénoms", option)
+
+                x += width_title_topic
+
+
+                rect_avg = QRect(x, y, width_title_avg, fm_height)
+                self.painter.fillRect(rect_avg, QColor("#cccccc"))
+                self.painter.drawRect(rect_avg)
+                self.painter.drawText(
+                        QRectF(x + 3, y + 3, width_title_avg - 6, fm_height - 6), 
+                        u"MOY.", option)
+
+                x += width_title_avg
+
+
+                rect_coef = QRect(x, y, width_title_coef, fm_height)
+                self.painter.fillRect(rect_coef, QColor("#cccccc"))
+                self.painter.drawRect(rect_coef)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, width_title_coef - 6, fm_height - 6), 
+                    u"COEF.", option)
+
+                x += width_title_coef
+
+
+
+                rect_avgcoef = QRect(x, y, width_title_avgcoef, fm_height) 
+                self.painter.fillRect(rect_avgcoef, QColor("#cccccc"))
+                self.painter.drawRect(rect_avgcoef)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, width_title_avgcoef - 6, fm_height - 6), 
+                    u"MOY. X COEF.", option)
+
+                x += width_title_avgcoef
+
+
+                rect_rank = QRect(x, y, width_title_rank, fm_height)
+                self.painter.fillRect(rect_rank, QColor("#cccccc"))
+                self.painter.drawRect(rect_rank)
+                self.painter.drawText(
+                        QRectF(x + 3, y + 3, width_title_rank - 6, fm_height - 6), 
+                        u"RANG", option)
+
+                x += width_title_rank
+
+
+
+                rect_prof = QRect(x, y, width_title_prof, fm_height)
+                self.painter.fillRect(rect_prof, QColor("#cccccc"))
+                self.painter.drawRect(rect_prof)
+                self.painter.drawText(
+                        QRectF(x + 3, y + 3, width_title_prof - 6, fm_height - 6), 
+                           u"PROFESSEUR", option)
+
+                x += width_title_prof
+            
+
+
+
+                rect_remark = QRect(x, y, width_title_remark, fm_height)
+                self.painter.fillRect(rect_remark, QColor("#cccccc"))
+                rect_remark = self.painter.drawRect(rect_remark)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, width_title_remark - 6, fm_height - 6), 
+                    u"APPRECIATION", option)
+
+                x += width_title_remark
+
+
+
+                rect_sign = QRect(x, y, width_title_sign, fm_height)
+                self.painter.fillRect(rect_sign, QColor("#cccccc"))
+                self.painter.drawRect(rect_sign)
+                self.painter.drawText(
+                        QRectF(x + 3, y + 3, width_title_sign - 6, fm_height - 6), 
+                         u"EMARGEMENT", option)
+
+
+
+
+            #===============> BEGIN TABLE CONTENT <====================
+
+                option = QTextOption(Qt.AlignLeft)
+                #option.setWrapMode(QTextOption.WordWrap)
+
+
+                x = left_margin
+                y += rect_topic.height()
+                previous_y = 0
+                bs_level_my = 0
+                level_mycoef = 0
+                bs_coef = 0
+                bs_mycoef = 0.0
+                bs_mycoef_level = 0
+
+                total_coef = 0
+                total_mycoef = 0.0
+                total_mycoef_level = 0
+
+
+                fm_height = int(fm.height() * 11)
+
+
+                for t in range(0, len(topics)):
+                
+                    tid = topics[t][0]
+                    topic_type = topics[t][3]
+                    prof = topic.Topic.getProfById(tid)
+
+                    font = QFont("Helvetica", 8, -1, True)
+                    self.painter.setFont(font)
+
+                    rect_one_topic = QRect(x, y, width_title_topic, fm_height)
+                    self.painter.drawRect(rect_one_topic)
+                    self.painter.drawText(
+                        QRectF(x + 3, y + 25, width_title_topic - 6, fm_height - 20), 
+                        topics[t][1].toUpper(), option)
+
+                    x += width_title_topic
+
+                    font = QFont("Helvetica", 7, -1, False)
+                    self.painter.setFont(font)
+
+                    my = student.Student.getStudentAverageByTopicAndMarkGroup(
+                          tid, current_std_id, group_period)
+                
+                    rect_one_avg = QRect(x, y, width_title_avg, fm_height)
+                    self.painter.drawRect(rect_one_avg)
+
+                    marks = topic.Topic.isStudentHasAnyMarksInThisTopicAndMarkGroup(
+                            tid, current_std_id, group_period)
+
+                    coef = ''
+                    if marks:
+                        coef = topics[t][2]
+                        bs_coef += coef
+                        bs_level_my = 20
+                        self.painter.drawText(
+                            QRectF(x + 3, y + 25, width_title_avg - 6, fm_height - 6), 
+                            QString("%L1/20").arg(my, 0, "f", 2), option)
+                    else:
+                        self.painter.drawText(
+                            QRectF(x + 3, y + 25, width_title_avg - 6, fm_height - 6), 
+                             u"", option)
+
+                    x += width_title_avg
+
+
+                    rect_one_coef = QRect(x, y, width_title_coef, fm_height)
+                    self.painter.drawRect(rect_one_coef)
+                    if coef:
+                        self.painter.drawText(
+                            QRectF(x + 30, y + 25, width_title_coef - 6, fm_height - 6), 
+                               QString("%1").arg(coef), option)
+                    else:
+                        self.painter.drawText(
+                              QRectF(x + 30, y + 25, width_title_coef - 6, fm_height - 6), 
+                                 QString("%1").arg(""), option)
+
+                    x += width_title_coef
+
+
+                    rect_one_avgcoef = QRect(x, y, width_title_avgcoef, fm_height)
+                    self.painter.drawRect(rect_one_avgcoef)
+                    if marks:
+                        if coef:
+                            mycoef = my * coef
+                            level_mycoef = coef * 20
+                        else:
+                            mycoef = my
+                            level_mycoef = 20
+
+                        bs_mycoef += mycoef
+                        bs_mycoef_level += level_mycoef
+
+                        self.painter.drawText(
+                            QRectF(x + 3, y + 25, width_title_avgcoef - 6, fm_height - 6), 
+                              QString("%L1/%2")
+                                 .arg(mycoef, 0, "f", 2)
+                                 .arg(level_mycoef)
+                              , option)
+
+
+                    else:
+                        self.painter.drawText(
+                            QRectF(x + 3, y + 25, width_title_avgcoef - 6, fm_height - 6), 
+                            u"", option)
+
+
+                    x += width_title_avgcoef
+
+                    rank = student.Student.getStudentAverageRankByTopicAndMarkGroup(
+                            current_std_crid, tid, my, group_period)
+                
+                    std_genre = infos_std['student_genre']
+                    rank = infos.Infos.rankMe(rank, std_genre)
+
+                    rect_one_rank = QRect(x, y, width_title_rank, fm_height)
+                    self.painter.drawRect(rect_one_rank)
+                    self.painter.drawText(
+                        QRectF(x + 3, y + 25, width_title_rank - 6, fm_height - 6), 
+                        rank, option)
+
+                    x += width_title_rank
+
+
+                    font = QFont("Helvetica", 5, -1, True)
+                    self.painter.setFont(font)
+
+                    rect_one_prof = QRect(x, y, width_title_prof, fm_height)
+                    self.painter.drawRect(rect_one_prof)
+                    self.painter.drawText(
+                        QRectF(x + 3, y + 3, width_title_prof - 6, fm_height - 20), 
+                        prof.toUpper(), option)
+
+                    font = QFont("Helvetica", 7, -1, False)
+                    self.painter.setFont(font)
+
+                    x += width_title_prof
+
+
+                    rect_one_remark = QRect(x, y, width_title_remark, fm_height)
+                    self.painter.drawRect(rect_one_remark)
+                    self.painter.drawText(
+                           QRectF(x + 3, y + 25, width_title_remark - 6, fm_height - 6), 
+                        u"", option)
+
+                    x += width_title_remark
+
+
+                    rect_one_sign = QRect(x, y, width_title_sign, fm_height)
+                    self.painter.drawRect(rect_one_sign)
+                    self.painter.drawText(
+                        QRectF(x + 3, y + 25, width_title_sign - 6, fm_height - 6), 
+                        u"", option)
+
+
+
+                    try:
+                        if topic_type != topics[t+1][3]:
+                            total_coef += bs_coef
+                            total_mycoef += bs_mycoef
+                            total_mycoef_level += bs_mycoef_level
+
+                            x = left_margin
+                            y += rect_one_topic.height()
+
+                            font = QFont("Helvetica", 8, -1, True)
+                            self.painter.setFont(font)
+
+                            rect_bs_topics_type = QRect(x, y, width_title_topic, fm_height)
+                            self.painter.fillRect(rect_bs_topics_type, QColor("#dfdfdf"))
+                            self.painter.drawRect(rect_bs_topics_type)
+                            self.painter.drawText(
+                                QRectF(x + 3, y + 25, width_title_topic - 6, fm_height - 6), 
+                                u"BILAN " + topic_type.toUpper(), option)
+
+                            x += width_title_topic
+
+                            font = QFont("Helvetica", 7, -1, False)
+                            self.painter.setFont(font)
+
+                            bs_my = student.Student.getStudentAverageByTopicTypeAndMarkGroup(
+                                        current_std_id, group_period, topic_type)
+
+                            bs_rank = student.Student.getStudentAverageRankByTopicTypeAndMarkGroup(
+                                    current_std_crid, topic_type, group_period, bs_my)
+
+                            bs_rank = infos.Infos.rankMe(bs_rank, std_genre)
+
+                            rect_bs_my = QRect(x, y, width_title_avg, fm_height)
+                            self.painter.fillRect(rect_bs_my, QColor("#dfdfdf"))
+                            self.painter.drawRect(rect_bs_my)
+                            self.painter.drawText(
+                                     QRectF(x + 3, y + 25, width_title_topic - 6, fm_height - 6), 
+                                     QString("%L1/%2")
+                                             .arg(bs_my, 0, "f", 2)
+                                             .arg(bs_level_my)
+                                        , option)
+
+
+                            x += width_title_avg
+
+                            rect_bs_coef = QRect(x, y, width_title_coef, fm_height)
+                            self.painter.fillRect(rect_bs_coef, QColor("#dfdfdf"))
+                            self.painter.drawRect(rect_bs_coef)
+                            self.painter.drawText(
+                                       QRectF(x + 30, y + 25, width_title_coef - 6, fm_height - 6), 
+                                       QString("%1").arg(bs_coef)
+                                            , option)
+
+                            x += width_title_coef
+
+                            rect_bs_mycoef = QRect(x, y, width_title_avgcoef, fm_height)
+                            self.painter.fillRect(rect_bs_mycoef, QColor("#dfdfdf"))
+                            self.painter.drawRect(rect_bs_mycoef)
+                            self.painter.drawText(
+                                       QRectF(x + 3, y + 25, width_title_avgcoef - 6, fm_height - 6), 
+                                       QString("%L1/%2")
+                                            .arg(bs_mycoef, 0, "f", 2)
+                                            .arg(bs_mycoef_level)
+                                       , option)
+
+
+                            x += width_title_avgcoef
+
+                            rect_bs_rank = QRect(x, y, width_title_rank, fm_height)
+                            self.painter.fillRect(rect_bs_rank, QColor("#dfdfdf"))
+                            self.painter.drawRect(rect_bs_rank)
+                            self.painter.drawText(
+                                   QRectF(x + 3, y + 25, width_title_rank - 6, fm_height - 6), 
+                                       QString("%1").arg(bs_rank)
+                                       , option)
+
+                            x += width_title_rank
+
+                            rect_bs_prof = QRect(x, y, 
+                                width_title_prof + width_title_remark + width_title_sign,
+                                fm_height)
+                            self.painter.fillRect(rect_bs_prof, QColor("#dfdfdf"))
+                            self.painter.drawRect(rect_bs_prof)
+                            self.painter.drawText(
+                                QRectF(x + 3, y + 25, 
+                       (width_title_prof + width_title_remark + width_title_sign) - 6, fm_height - 6), 
+                                     u"", option)
+
+
+
+                            bs_level_my = 0
+                            bs_coef = 0
+                            bs_mycoef = 0.0
+                            bs_mycoef_level = 0
+
+                    except IndexError:
+
+                        total_coef += bs_coef
+                        total_mycoef += bs_mycoef
+                        total_mycoef_level += bs_mycoef_level
+
+                        x = left_margin
+                        y += rect_one_topic.height()
+
+                        font = QFont("Helvetica", 8, -1, True)
+                        self.painter.setFont(font)
+
+                        rect_bs_topics = QRect(x, y, width_title_topic, fm_height)
+                        self.painter.fillRect(rect_bs_topics, QColor("#dfdfdf"))
+                        self.painter.drawRect(rect_bs_topics)
+                        self.painter.drawText(
+                        QRectF(x + 3, y + 25, width_title_topic - 6, fm_height - 6), 
+                        u"BILAN " + topic_type.toUpper(), option)
+
+                        x += width_title_topic
+
+                        font = QFont("Helvetica", 7, -1, False)
+                        self.painter.setFont(font)
+
+
+                        bs_my = student.Student.getStudentAverageByTopicTypeAndMarkGroup(
+                                current_std_id, group_period, topic_type)
+
+                        bs_rank = student.Student.getStudentAverageRankByTopicTypeAndMarkGroup(
+                                current_std_crid, topic_type, group_period, bs_my)
+
+                        bs_rank = infos.Infos.rankMe(bs_rank, std_genre)
+
+
+                        rect_bs_my = QRect(x, y, width_title_avg, fm_height)
+                        self.painter.fillRect(rect_bs_my, QColor("#dfdfdf"))
+                        self.painter.drawRect(rect_bs_my)
+                        self.painter.drawText(
+                                   QRectF(x + 3, y + 25, width_title_avg - 6, fm_height - 6), 
+                                   QString("%L1/%2")
+                                             .arg(bs_my, 0, "f", 2)
+                                             .arg(bs_level_my)
+                                            , option)
+
+                        x += width_title_avg
+
+                        rect_bs_coef = QRect(x, y, width_title_coef, fm_height)
+                        self.painter.fillRect(rect_bs_coef, QColor("#dfdfdf"))
+                        self.painter.drawRect(rect_bs_coef)
+                        self.painter.drawText(
+                                   QRectF(x + 30, y + 25, width_title_coef - 6, fm_height - 6), 
+                                   QString("%1").arg(bs_coef)
+                                            , option)
+
+                        x += width_title_coef
+
+                        rect_bs_mycoef = QRect(x, y, width_title_avgcoef, fm_height)
+                        self.painter.fillRect(rect_bs_mycoef, QColor("#dfdfdf"))
+                        self.painter.drawRect(rect_bs_mycoef)
+                        self.painter.drawText(
+                                   QRectF(x + 3, y + 25, width_title_avgcoef - 6, fm_height - 6), 
+                                   QString("%L1/%2")
+                                           .arg(bs_mycoef, 0, "f", 2)
+                                           .arg(bs_mycoef_level)
+                                        , option)
+
+
+
+                        x += width_title_avgcoef
+
+                        rect_bs_rank = QRect(x, y, width_title_rank, fm_height)
+                        self.painter.fillRect(rect_bs_rank, QColor("#dfdfdf"))
+                        self.painter.drawRect(rect_bs_rank)
+                        self.painter.drawText(
+                                   QRectF(x + 3, y + 25, width_title_rank - 6, fm_height - 6), 
+                                   QString("%1").arg(bs_rank)
+                                            , option)
+
+
+                        x += width_title_rank
+
+                        rect_bs_prof = QRect(x, y, 
+                              width_title_prof + width_title_remark + width_title_sign,
+                              fm_height)
+                        self.painter.fillRect(rect_bs_prof, QColor("#dfdfdf"))
+                        self.painter.drawRect(rect_bs_prof)
+                        self.painter.drawText(
+                          QRectF(x + 3, y + 25, 
+                      (width_title_prof + width_title_remark + width_title_sign) - 6, fm_height - 6), 
+                                     u"", option)
+
+                        bs_level_my = 0
+                        bs_coef = 0
+                        bs_mycoef = 0.0
+                        bs_mycoef_level = 0
+
+
+                    if y + 1035 >= pageRect.height():
+                        self.printer.newPage()
+                        pageRect = self.printer.pageRect()
+                        y = initial_y
+                        self.footer()
+
+
+                    x = left_margin
+                    y += rect_one_topic.height()
+
+            
+
+                x = left_margin
+                y += rect_one_topic.height() - 100
+
+                if y + 1035 >= pageRect.height():
+                    self.printer.newPage()
+                    pageRect = self.printer.pageRect()
+                    y = initial_y
+                    self.footer()
+
+                # total points
+                option = QTextOption(Qt.AlignCenter)
+            
+                w = width_title_topic + width_title_avg + width_title_coef + width_title_avgcoef
+                w += width_title_rank + width_title_prof + width_title_remark + width_title_sign
+
+
+                font = QFont("Helvetica", 8, -1, False)
+                self.painter.setFont(font)
+
+                rect_total_p = QRect(x, y, w, fm_height)
+                self.painter.drawRect(rect_total_p)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, w - 6, fm_height - 6), 
+                        QString("Total points:  %L1/%2      Total coefficient:   %3")
+                        .arg(total_mycoef, 0, "f", 2)
+                        .arg(total_mycoef_level)
+                        .arg(total_coef)
+                    , option)
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+
+                if y + 2000 >= pageRect.height():
+                    self.printer.newPage()
+                    pageRect = self.printer.pageRect()
+                    y = initial_y
+                    self.footer()
+
+
+                # mg_avg_rank
+                x = left_margin
+                y += rect_total_p.height()
+                old_y = y
+            
+                rect_height = 1150
+                if group_period == u'2ème Trimestre' or group_period == u'3ème Trimestre' or group_period == u'2ème Semestre':
+                    rect_height = 1200
+
+                rect_mg_avg_rank = QRect(x, y, width_title_topic, fm_height + rect_height)
+                self.painter.drawRect(rect_mg_avg_rank)
+                self.painter.drawText(
+                      QRectF(x + 3, y + 3, width_title_topic - 6, fm_height - 6), 
+                      u""
+                      , option)
+
+
+                if rect_height == 1200:
+                    t_x = x
+                    t_y = y
+                    w_recall = width_title_topic - 1200
+
+
+                    rect_recall = QRect(t_x, y, w_recall, fm_height + 10)
+                    self.painter.drawRect(rect_recall)
+                    self.painter.drawText(
+                             QRectF(t_x + 1, y, w_recall - 6, fm_height - 10), 
+                             u"Rappel", option)
+
+                    t_x += rect_recall.width()
+                    w_moy = w_recall - 400
+
+                    rect_moy = QRect(t_x, y, w_moy, fm_height + 10)
+                    self.painter.drawRect(rect_moy)
+                    self.painter.drawText(
+                        QRectF(t_x + 1, y, w_moy - 6, fm_height - 10), 
+                         u"Moyenne", option)
+
+                    t_x += rect_moy.width()
+                    w_rank = width_title_topic - (w_recall + w_moy)
+
+                    rect_rank = QRect(t_x, y, w_rank, fm_height + 10)
+                    self.painter.drawRect(rect_rank)
+                    self.painter.drawText(
+                         QRectF(t_x + 1, y, w_rank - 6, fm_height - 10), 
+                         u"Rang", option)
+
+                    if group_period == u'2ème Trimestre':
+                        t_x = x
+                        t_y += rect_rank.height()
+
+                        font = QFont("Helvetica", 7, -1, True)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignLeft)
+
+                        rect_recall_one = QRect(t_x, t_y, w_recall, fm_height)
+                        self.painter.drawRect(rect_recall_one)
+                        self.painter.drawText(
+                             QRectF(t_x + 1, t_y, w_recall - 6, fm_height - 6), 
+                             u"1er Trimestre", option)
+
+                        t_x += rect_recall_one.width()
+
+                        font = QFont("Helvetica", 7, -1, False)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignCenter)
+
+                        mg = u'1er Trimestre'
+                        r_mg_my = student.Student.getStudentAverageByMarkGroup(
+                               current_std_id, mg) 
+
+                        r_mg_rank = student.Student.getStudentAverageRankByMarkGroup(
+                               current_std_crid, mg, r_mg_my)
+
+                        r_mg_rank = infos.Infos.rankMe(r_mg_rank, std_genre)
+        
+
+                        rect_moy_one = QRect(t_x, t_y, w_moy, fm_height)
+                        self.painter.drawRect(rect_moy_one)
+                        self.painter.drawText(
+                                 QRectF(t_x + 1, t_y, w_moy - 6, fm_height - 6), 
+                                 QString("%L1/20")
+                                     .arg(r_mg_my, 0, "f", 2)
+                                 , option)
+
+                        t_x += rect_moy_one.width()
+
+                        rect_rank_one = QRect(t_x, t_y, w_rank, fm_height)
+                        self.painter.drawRect(rect_rank_one)
+                        self.painter.drawText(
+                            QRectF(t_x + 1, t_y, w_rank - 6, fm_height - 6), 
+                                QString("%1")
+                                   .arg(r_mg_rank)
+                                , option)
+
+                    if group_period == u'3ème Trimestre':
+                        # 1st
+                        t_x = x
+                        t_y += rect_rank.height()
+
+                        font = QFont("Helvetica", 7, -1, True)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignLeft)
+
+                        rect_recall_one = QRect(t_x, t_y, w_recall, fm_height)
+                        self.painter.drawRect(rect_recall_one)
+                        self.painter.drawText(
+                              QRectF(t_x + 1, t_y, w_recall - 6, fm_height - 6), 
+                              u"1er Trimestre", option)
+
+                        t_x += rect_recall_one.width()
+
+                        font = QFont("Helvetica", 7, -1, False)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignCenter)
+
+
+                        mg = u'1er Trimestre'
+                        r_mg_my = student.Student.getStudentAverageByMarkGroup(
+                             current_std_id, mg) 
+
+                        r_mg_rank = student.Student.getStudentAverageRankByMarkGroup(
+                                current_std_crid, mg, r_mg_my)
+
+                        r_mg_rank = infos.Infos.rankMe(r_mg_rank, std_genre)
+
+
+                        rect_moy_one = QRect(t_x, t_y, w_moy, fm_height)
+                        self.painter.drawRect(rect_moy_one)
+                        self.painter.drawText(
+                            QRectF(t_x + 1, t_y, w_moy - 6, fm_height - 6), 
+                             QString("%L1/20")
+                                 .arg(r_mg_my, 0, "f", 2)
+                             , option)
+
+                        t_x += rect_moy_one.width()
+
+                        rect_rank_one = QRect(t_x, t_y, w_rank, fm_height)
+                        self.painter.drawRect(rect_rank_one)
+                        self.painter.drawText(
+                             QRectF(t_x + 1, t_y, w_rank - 6, fm_height - 6), 
+                             QString("%1")
+                                 .arg(r_mg_rank)
+                             , option)
+
+                        #2nd
+                        t_x = x
+                        t_y += rect_rank_one.height()
+
+                        font = QFont("Helvetica", 7, -1, True)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignLeft)
+
+                        rect_recall_one = QRect(t_x, t_y, w_recall, fm_height)
+                        self.painter.drawRect(rect_recall_one)
+                        self.painter.drawText(
+                                 QRectF(t_x + 1, t_y, w_recall - 6, fm_height - 6), 
+                                 u"2ème Trimestre", option)
+
+                        t_x += rect_recall_one.width()
+
+                        font = QFont("Helvetica", 7, -1, False)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignCenter)
+
+
+                        mg = u'2ème Trimestre'
+                        r_mg_my = student.Student.getStudentAverageByMarkGroup(
+                            current_std_id, mg) 
+
+                        r_mg_rank = student.Student.getStudentAverageRankByMarkGroup(
+                            current_std_crid, mg, r_mg_my)
+
+                        r_mg_rank = infos.Infos.rankMe(r_mg_rank, std_genre)
+
+
+
+                        rect_moy_one = QRect(t_x, t_y, w_moy, fm_height)
+                        self.painter.drawRect(rect_moy_one)
+                        self.painter.drawText(
+                                 QRectF(t_x + 1, t_y, w_moy - 6, fm_height - 6), 
+                                 QString("%L1/20")
+                                     .arg(r_mg_my, 0, "f", 2)
+                                 , option)
+
+                        t_x += rect_moy_one.width()
+
+                        rect_rank_one = QRect(t_x, t_y, w_rank, fm_height)
+                        self.painter.drawRect(rect_rank_one)
+                        self.painter.drawText(
+                                 QRectF(t_x + 1, t_y, w_rank - 6, fm_height - 6), 
+                                 QString("%1")
+                                     .arg(r_mg_rank)
+                                 , option)
+
+
+                    if group_period == u'2ème Semestre':
+                        t_x = x
+                        t_y += rect_rank.height()
+
+                        font = QFont("Helvetica", 7, -1, True)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignLeft)
+
+                        rect_recall_one = QRect(t_x, t_y, w_recall, fm_height)
+                        self.painter.drawRect(rect_recall_one)
+                        self.painter.drawText(
+                                 QRectF(t_x + 1, t_y, w_recall - 6, fm_height - 6), 
+                                 u"1er Semestre", option)
+
+                        t_x += rect_recall_one.width()
+
+                        font = QFont("Helvetica", 7, -1, False)
+                        self.painter.setFont(font)
+                        option = QTextOption(Qt.AlignCenter)
+
+                        mg = u'1er Semestre'
+                        r_mg_my = student.Student.getStudentAverageByMarkGroup(
+                            current_std_id, mg) 
+
+                        r_mg_rank = student.Student.getStudentAverageRankByMarkGroup(
+                            current_std_crid, mg, r_mg_my)
+
+                        r_mg_rank = infos.Infos.rankMe(r_mg_rank, std_genre)
+        
+
+                        rect_moy_one = QRect(t_x, t_y, w_moy, fm_height)
+                        self.painter.drawRect(rect_moy_one)
+                        self.painter.drawText(
+                                 QRectF(t_x + 1, t_y, w_moy - 6, fm_height - 6), 
+                                 QString("%L1/20")
+                                    .arg(r_mg_my, 0, "f", 2)
+                                 , option)
+
+                        t_x += rect_moy_one.width()
+
+                        rect_rank_one = QRect(t_x, t_y, w_rank, fm_height)
+                        self.painter.drawRect(rect_rank_one)
+                        self.painter.drawText(
+                                QRectF(t_x + 1, t_y, w_rank - 6, fm_height - 6), 
+                                QString("%1")
+                                    .arg(r_mg_rank)
+                                , option)
+
+
+
+                cut = 350
+                moy_text_y = 100
+                rank_text_y = 700
+                if rect_height == 1200:
+                    cut = 700
+                    moy_text_y = 700
+                    rank_text_y = 1000
+
+                avg_group_period = student.Student.getStudentAverageByMarkGroup(
+                    current_std_id, group_period)
+
+                rank_group_period = student.Student.getStudentAverageRankByMarkGroup(
+                    current_std_crid, group_period, avg_group_period)
+
+                rank_group_period = infos.Infos.rankMe(rank_group_period, std_genre)
+
+                font = QFont("Helvetica", 7.8, -1, False)
+                self.painter.setFont(font)
+
+                rect_mg_avg = QRect(x, y, width_title_topic, fm_height + cut)
+                self.painter.drawRect(rect_mg_avg)
+                self.painter.drawText(
+                    QRectF(x + 3, y + moy_text_y, width_title_topic - 6, fm_height - 10), 
+                    QString("Moyenne du %1: %L2/20")
+                              .arg(group_period)
+                              .arg(avg_group_period, 0, "f", 2)
+                    , option)
+
+
+                font = QFont("Helvetica", 8, -1, False)
+                self.painter.setFont(font)
+
+                self.painter.drawText(
+                    QRectF(x + 3, y + rank_text_y, width_title_topic - 6, fm_height - 10), 
+                    QString("Rang:  %1")
+                              .arg(rank_group_period)
+                    , option)
+
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+
+                x += width_title_topic
+
+            
+                # price
+                w_price = width_title_avg + width_title_coef + width_title_avgcoef
+
+                option = QTextOption(Qt.AlignLeft)
+
+                rect_mg_price = QRect(x, y, w_price, fm_height + rect_height)
+                self.painter.drawRect(rect_mg_price)
+
+
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, w_price - 6, fm_height - 10), 
+                    QString(u"TH + FELICITATION ")
+                    , option)
+
+                rect_little = w_price - (width_title_avgcoef + width_title_avg)
+                rect_little -= 170
+                rect_th_cong = QRect(x + 1700, y + 10, rect_little, fm_height - 25)
+                self.painter.drawRect(rect_th_cong)
+
+                y += rect_th_cong.height() 
+
+                self.painter.drawText(
+                    QRectF(x + 3, y + 40, w_price - 6, fm_height - 10), 
+                    QString(u"TH + ENCOURAGEMENT ")
+                    , option)
+
+                rect_little_two = w_price - (width_title_avgcoef + width_title_avg)
+                rect_little_two -= 170
+                rect_th_encou = QRect(x + 1700, y + 10, rect_little_two, fm_height - 25)
+                self.painter.drawRect(rect_th_encou)
+
+                y += rect_th_encou.height()
+
+                self.painter.drawText(
+                        QRectF(x + 3, y + 40, w_price - 6, fm_height - 10), 
+                        QString(u"TABLEAU D'HONNEUR ")
+                      , option)
+
+                rect_little_three = w_price - (width_title_avgcoef + width_title_avg)
+                rect_little_three -= 170
+                rect_th = QRect(x + 1700, y + 10, rect_little_three, fm_height - 25)
+                self.painter.drawRect(rect_th)
+
+                y += rect_th.height()
+
+
+                self.painter.drawText(
+                        QRectF(x + 3, y + 40, w_price - 6, fm_height - 10), 
+                           QString(u"AVERTISSEMEMENT")
+                        , option)
+
+                rect_little_four = w_price - (width_title_avgcoef + width_title_avg)
+                rect_little_four -= 170
+                rect_warning = QRect(x + 1700, y + 10, rect_little_four, fm_height - 25)
+                self.painter.drawRect(rect_warning)
+
+
+                y += rect_warning.height()
+
+                self.painter.drawText(
+                    QRectF(x + 3, y + 40, w_price - 6, fm_height - 10), 
+                    QString(u"BLÂME")
+                    , option)
+
+                rect_little_five = w_price - (width_title_avgcoef + width_title_avg)
+                rect_little_five -= 170
+                rect_blame = QRect(x + 1700, y + 10, rect_little_five, fm_height - 25)
+                self.painter.drawRect(rect_blame)
+
+                y += rect_blame.height()
+
+                self.painter.drawText(
+                    QRectF(x + 3, y + 40, w_price - 6, fm_height - 10), 
+                    QString(u"ABSENCES JUSTIFIÉES")
+                    , option)
+
+                rect_little_six = w_price - (width_title_avgcoef + width_title_avg)
+                rect_little_six -= 170
+                rect_away_verified = QRect(x + 1700, y + 10, rect_little_six, fm_height - 25)
+                self.painter.drawRect(rect_away_verified)
+
+
+                font = QFont("Helvetica", 6, -1, False)
+                self.painter.setFont(font)
+
+                nb_away_verified = student.Student.getVerifiedAways(current_std_id,
+                        group_period)
+
+                self.painter.drawText(
+                    QRectF(x + 1708, y + 30, rect_little_six, fm_height - 10), 
+                    QString(str(nb_away_verified) + u"h")
+                    , option)
+
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+
+
+                y += rect_away_verified.height()
+
+            
+                self.painter.drawText(
+                    QRectF(x + 3, y + 40, w_price - 6, fm_height - 10), 
+                    QString(u"ABSENCES NON JUSTIFIÉES")
+                    , option)
+
+                rect_little_seven = w_price - (width_title_avgcoef + width_title_avg)
+                rect_little_seven -= 170
+                rect_away_unverified = QRect(x + 1700, y + 10, rect_little_seven, fm_height - 25)
+                self.painter.drawRect(rect_away_unverified)
+
+
+                nb_away_unverified = student.Student.getUnVerifiedAways(current_std_id,
+                        group_period)
+
+                font = QFont("Helvetica", 6, -1, False)
+                self.painter.setFont(font)
+
+                self.painter.drawText(
+                    QRectF(x + 1708, y + 30, rect_little_seven, fm_height - 10), 
+                    QString(str(nb_away_unverified) + u"h")
+                    , option)
+
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+
+
+                x += rect_mg_price.width()
+                y = old_y 
+
+                # slices
+                w_slices = width_title_rank + width_title_prof + width_title_remark + width_title_sign
+
+                rect_mg_avg_slices = QRect(x, y, w_slices, fm_height + rect_height)
+                self.painter.drawRect(rect_mg_avg_slices)
+
+                option = QTextOption(Qt.AlignCenter)
+
+                font = QFont("Helvetica", 8, -1, False)
+                self.painter.setFont(font)
+
+                self.painter.drawText(
+                    QRectF(x + 3, y - 30, w_slices - 6, fm_height - 10), 
+                    u"Repartition des moyennes par tranche", option)
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+
+                old_x = x 
+                rect_w_slices = w_slices - (width_title_prof + width_title_remark + width_title_sign)
+                rect_less_zero = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_less_zero)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    u"] - ; 0 ]", option)
+
+                x += rect_less_zero.width()
+
+                rect_less_eq_8 = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_less_eq_8)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    u"] - ; 8.50 ]", option)
+
+
+                x += rect_less_eq_8.width()
+
+                rect_range_8_10 = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_range_8_10)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    u"[ 8.50 ; 10.00 ]", option)
+
+                x += rect_range_8_10.width()
+
+                rect_plus_10 = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_plus_10)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    u"[ 10.00 ; - [", option)
+
+
+                y += rect_plus_10.height()
+                x = old_x
+
+                avg_slices = classe.Class.getSlicesAverageByMarkGroup(
+                    current_std_crid, group_period)
+
+                rect_less_zero_one = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_less_zero_one)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    QString("%1")
+                        .arg(avg_slices[0])
+                    , option)
+
+                x += rect_less_zero_one.width()
+
+                rect_less_eq_8_one = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_less_eq_8_one)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    QString("%1")
+                        .arg(avg_slices[1])
+                    , option)
+
+                x += rect_less_eq_8_one.width()
+
+                rect_range_8_10_one = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_range_8_10_one)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    QString("%1")
+                        .arg(avg_slices[2])
+                    , option)
+
+
+                x += rect_range_8_10.width()
+
+                rect_plus_10_one = QRect(x + 600, y + 150, rect_w_slices, fm_height - 25)
+                self.painter.drawRect(rect_plus_10_one)
+
+                self.painter.drawText(
+                    QRectF(x + 600, y + 140, rect_w_slices - 6, fm_height - 10), 
+                    QString("%1")
+                        .arg(avg_slices[3])
+                    , option)
+
+                y += rect_plus_10_one.height()
+                x = old_x
+
+                font = QFont("Helvetica", 8, -1, False)
+                self.painter.setFont(font)
+
+                first_last = classe.Class.getFirstStudentAverageAndLastStudentAverageByMarkGroup(
+                    current_std_crid, group_period)
+
+                self.painter.drawText(
+                    QRectF(x + 3, y + 160, w_slices - 6, fm_height - 10), 
+                    QString("Moyenne du 1er:   %L1/20     Moyenne du dernier:   %L2/20")
+                         .arg(first_last[0], 0, "f", 2)
+                         .arg(first_last[1], 0, "f", 2)
+                    , option)
+
+                current_std_cr_avg = classe.Class.getClassroomAverageByMarkGroup(
+                    current_std_crid, group_period)
+
+                self.painter.drawText(
+                    QRectF(x + 3, y + 300, w_slices - 6, fm_height - 10), 
+                    QString("Moyenne de la classe:     %L1/20")
+                       .arg(current_std_cr_avg, 0, "f", 2)
+                    , option)
+
+
+                if group_period == u'3ème Trimestre' or group_period == u'2ème Semestre':
+                    avg_yearly_current_std_id = student.Student.getStudentYearlyAverage(
+                        current_std_id)
+
+                    rank_yearly_current_std_id = student.Student.getStudentYearlyRank(
+                        current_std_crid, avg_yearly_current_std_id)
+
+                    rank_yearly_current_std_id = infos.Infos.rankMe(
+                        rank_yearly_current_std_id, std_genre)
+
+                    self.painter.drawText(
+                        QRectF(x + 3, y + 700, w_slices - 6, fm_height - 10), 
+                        QString("Moyenne annuelle:  %L1/20")
+                        .arg(avg_yearly_current_std_id, 0, "f", 2)
+                    , option)
+
+                    self.painter.drawText(
+                        QRectF(x + 3, y + 850, w_slices - 6, fm_height - 10), 
+                        QString("Rang annuelle:  %1")
+                        .arg(rank_yearly_current_std_id)
+                     , option)
+
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+            
+                y = old_y
+                y += rect_mg_avg_slices.height()
+                x = left_margin
+
+                if y + 1035 >= pageRect.height():
+                    self.printer.newPage()
+                    pageRect = self.printer.pageRect()
+                    y = initial_y
+                    self.footer()
+
+                font = QFont("Helvetica", 8, -1, False)
+                self.painter.setFont(font)
+
+                rect_dir = QRect(x, y, width_title_topic, fm_height + rect_height - 300)
+                self.painter.drawRect(rect_dir)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, width_title_topic - 6, fm_height - 6), 
+                    u"DIRECTEUR:", option)
+
+                x += width_title_topic
+
+                rect_main_prof = QRect(x, y, w_price, fm_height + rect_height - 300)
+                self.painter.drawRect(rect_main_prof)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, w_price - 6, fm_height - 6), 
+                    u"Professeur principal:", option)
+
+
+                x += rect_main_prof.width()
+
+                rect_main_prof = QRect(x, y, w_slices, fm_height + rect_height - 300)
+                self.painter.drawRect(rect_main_prof)
+                self.painter.drawText(
+                    QRectF(x + 3, y + 3, w_slices - 6, fm_height - 6), 
+                    u"Décision du conseil de classe:", option)
+
+                font = QFont("Helvetica", 7, -1, False)
+                self.painter.setFont(font)
+
+                if not s + 1 == len(stds_id):
+                    self.printer.newPage()
+                
+                self.painter.restore()
+
+            #===============> END TABLE CONTENT <====================
+
+
+
+                s += 1
+
+            self.painter.end()
+        
+        
         
         
     

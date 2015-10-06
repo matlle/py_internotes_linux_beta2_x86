@@ -15,7 +15,7 @@ def send_email(to, subject, msg):
     import smtplib
 
     gmail_user = "matllesoftware@gmail.com"
-    gmail_pwd = "matlle2015"
+    gmail_pwd = "yourpassword"
     FROM = 'matllesoftware@gmail.com'
     TO = [str(to)] 
     SUBJECT = subject

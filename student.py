@@ -2350,7 +2350,7 @@ class Student(QTreeView):
             reply = dialog_photo_preview.exec_()
 
             self.new_photo_file_name = QString(
-                    QDir.currentPath() + u"/mpl-data/images/upload/userphoto/" + \
+                    QDir.currentPath() + u"/images/upload/userphoto/" + \
                             uuid.uuid1().hex + ".png")
 
             if reply == 1:
